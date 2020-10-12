@@ -4,7 +4,7 @@
             'i: ' print.
             i asString print.
             '\n' print.
-            'number of frames: ' print.
+            'number of \'frames\': \'' print.
             primitives interpreter numberOfFrames asString print.
             '\n\n' print.
 
