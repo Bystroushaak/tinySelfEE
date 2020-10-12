@@ -157,7 +157,7 @@ public class Tokenizer {
             advance();
         }
 
-        addToken(TokenType.HEX_NUMBER);
+        addToken(TokenType.NUMBER_HEX);
     }
 
     private boolean isHexNum(char c) {
@@ -173,7 +173,7 @@ public class Tokenizer {
         }
 
         if (float_number) {
-            addToken(TokenType.FLOAT_NUMBER);
+            addToken(TokenType.NUMBER_FLOAT);
         } else {
             addToken(TokenType.NUMBER);
         }

@@ -14,7 +14,7 @@ public class TokenizerTest {
         ArrayList<Token> tokens = t.tokenize();
 
         Token hex_number = tokens.get(0);
-        assertEquals(hex_number.type, TokenType.HEX_NUMBER);
+        assertEquals(hex_number.type, TokenType.NUMBER_HEX);
         assertEquals(hex_number.content, "0x01");
 
         assertEquals(tokens.get(1).type, TokenType.EOF);
@@ -38,7 +38,7 @@ public class TokenizerTest {
         ArrayList<Token> tokens = t.tokenize();
 
         Token hex_number = tokens.get(0);
-        assertEquals(hex_number.type, TokenType.FLOAT_NUMBER);
+        assertEquals(hex_number.type, TokenType.NUMBER_FLOAT);
         assertEquals(hex_number.content, "123.3");
 
         assertEquals(tokens.get(1).type, TokenType.EOF);
@@ -50,7 +50,7 @@ public class TokenizerTest {
         ArrayList<Token> tokens = t.tokenize();
 
         Token hex_number = tokens.get(0);
-        assertEquals(hex_number.type, TokenType.FLOAT_NUMBER);
+        assertEquals(hex_number.type, TokenType.NUMBER_FLOAT);
         assertEquals(hex_number.content, "123.3");
 
         assertEquals(tokens.get(1).type, TokenType.END_OF_EXPR);
