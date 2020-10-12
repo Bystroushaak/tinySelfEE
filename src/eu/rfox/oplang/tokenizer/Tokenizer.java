@@ -119,6 +119,14 @@ public class Tokenizer {
         return source.charAt(current_char_index);
     }
 
+    private char peekTwo() {
+        current_char_index++;
+        char c = peek();
+        current_char_index--;
+
+        return c;
+    }
+
     private void consumeString(TokenType token_type) throws UnterminatedStringException {
         char end_char = token_type == TokenType.DOUBLE_Q_STRING ? '"' : '\'';
 
@@ -149,7 +157,7 @@ public class Tokenizer {
             advance();
         }
 
-        advance();
+        addToken(TokenType.HEX_NUMBER);
     }
 
     private boolean isHexNum(char c) {
@@ -157,5 +165,17 @@ public class Tokenizer {
     }
 
     private void consumeNumber() {
+        boolean float_number = false;
+        while (isDigit(peek()) || (! float_number && (peek() == '.' && isDigit(peekTwo())))) {
+            if (advance() == '.'){
+                float_number = true;
+            }
+        }
+
+        if (float_number) {
+            addToken(TokenType.FLOAT_NUMBER);
+        } else {
+            addToken(TokenType.NUMBER);
+        }
     }
 }

@@ -3,6 +3,8 @@ package eu.rfox.oplang.tokenizer;
 enum TokenType {
     SELF,
     NUMBER,
+    HEX_NUMBER,
+    FLOAT_NUMBER,
     OBJ_START,
     OBJ_END,
     BLOCK_START,
