@@ -1,4 +1,4 @@
-package eu.rfox.tokenizer;
+package eu.rfox.oplang.tokenizer;
 
 public class TokenizerException extends Exception {
     public Token token;

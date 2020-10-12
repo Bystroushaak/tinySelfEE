@@ -1,8 +1,8 @@
-package eu.rfox;
+package eu.rfox.oplang;
 
-import eu.rfox.parser.Parser;
-import eu.rfox.parser.ast.ASTItem;
-import eu.rfox.tokenizer.TokenizerException;
+import eu.rfox.oplang.parser.Parser;
+import eu.rfox.oplang.parser.ast.ASTItem;
+import eu.rfox.oplang.tokenizer.TokenizerException;
 
 import java.io.IOException;
 import java.util.ArrayList;

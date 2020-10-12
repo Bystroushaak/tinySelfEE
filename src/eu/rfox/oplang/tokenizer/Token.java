@@ -1,4 +1,4 @@
-package eu.rfox.tokenizer;
+package eu.rfox.oplang.tokenizer;
 
 enum TokenType {
     SELF,
@@ -21,6 +21,7 @@ enum TokenType {
     IDENTIFIER,
     ASSIGNMENT,
     COMMENT,
+    UNEXPECTED,
     EOF
 }
 

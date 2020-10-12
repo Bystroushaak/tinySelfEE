@@ -1,4 +1,4 @@
-package eu.rfox.tokenizer;
+package eu.rfox.oplang.tokenizer;
 
 import java.util.ArrayList;
 
@@ -76,12 +76,29 @@ public class Tokenizer {
             case '\'':
                 consumeString(TokenType.SINGLE_Q_STRING);
                 return;
+            case ' ':
+            case '\r':
+            case '\t':
+            case '\n':
+                return;
         }
 
         if (c == '<' && peek() == '-') {
             advance();
             addToken(TokenType.RW_ASSIGNMENT);
             return;
+        }
+
+        if (isDigit(c)) {
+            if (peek() == 'x' || peek() == 'X') {
+                advance();
+                advance();
+                consumeHexNumber();
+                return;
+            } else {
+                consumeNumber();
+                return;
+            }
         }
     }
 
@@ -121,5 +138,24 @@ public class Tokenizer {
         advance();
         String content = source.substring(start_char_index + 1, current_char_index - 1);
         addToken(token_type, content);
+    }
+
+    private boolean isDigit(char c) {
+        return c >= '0' && c <= '9';
+    }
+
+    private void consumeHexNumber() {
+        while (isHexNum(peek())) {
+            advance();
+        }
+
+        advance();
+    }
+
+    private boolean isHexNum(char c) {
+        return isDigit(c) || (c >= 'A' && c <= 'F') || (c >= 'A' && c <= 'F');
+    }
+
+    private void consumeNumber() {
     }
 }
