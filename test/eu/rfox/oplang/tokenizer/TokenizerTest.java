@@ -129,4 +129,60 @@ public class TokenizerTest {
 
         assertEquals(tokens.get(4).type, TokenType.EOF);
     }
+
+    @Test
+    public void consumeFirstKeyword() throws TokenizerException {
+        Tokenizer t = new Tokenizer(" something: ");
+        ArrayList<Token> tokens = t.tokenize();
+
+        Token keyword = tokens.get(0);
+        assertEquals(keyword.type, TokenType.FIRST_KW);
+        assertEquals(keyword.content, "something");
+
+        assertEquals(tokens.get(1).type, TokenType.EOF);
+    }
+
+    @Test
+    public void consumeKeywords() throws TokenizerException {
+        Tokenizer t = new Tokenizer(" Something: ");
+        ArrayList<Token> tokens = t.tokenize();
+
+        Token keyword = tokens.get(0);
+        assertEquals(keyword.type, TokenType.KEYWORD);
+        assertEquals(keyword.content, "Something");
+
+        assertEquals(tokens.get(1).type, TokenType.EOF);
+    }
+
+    @Test
+    public void consumeIdentifier() throws TokenizerException {
+        Tokenizer t = new Tokenizer(" Someth1n_g");
+        ArrayList<Token> tokens = t.tokenize();
+
+        Token identifier = tokens.get(0);
+        assertEquals(identifier.type, TokenType.IDENTIFIER);
+        assertEquals(identifier.content, "Someth1n_g");
+
+        assertEquals(tokens.get(1).type, TokenType.EOF);
+    }
+
+    @Test
+    public void consumeSelf() throws TokenizerException {
+        Tokenizer t = new Tokenizer("self Someth1n_g self");
+        ArrayList<Token> tokens = t.tokenize();
+
+        Token self = tokens.get(0);
+        assertEquals(self.type, TokenType.IDENTIFIER);
+        assertEquals(self.content, "Someth1n_g");
+
+        Token identifier = tokens.get(1);
+        assertEquals(identifier.type, TokenType.IDENTIFIER);
+        assertEquals(identifier.content, "Someth1n_g");
+
+        self = tokens.get(2);
+        assertEquals(self.type, TokenType.IDENTIFIER);
+        assertEquals(self.content, "Someth1n_g");
+
+        assertEquals(tokens.get(3).type, TokenType.EOF);
+    }
 }

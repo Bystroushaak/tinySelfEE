@@ -40,7 +40,7 @@ public class Tokenizer {
         return c;
     }
 
-    private void scanToken() throws UnterminatedStringException {
+    private void scanToken() throws UnterminatedStringException, UnexpectedTokenException {
         char c = advance();
 
         // handle case of == which would have been caught in the switch next
@@ -97,9 +97,7 @@ public class Tokenizer {
             advance();
             addToken(TokenType.RW_ASSIGNMENT);
             return;
-        }
-
-        if (isDigit(c)) {
+        } else if (isDigit(c)) {
             if (peek() == 'x' || peek() == 'X') {
                 consumeHexNumber();
                 return;
@@ -107,17 +105,21 @@ public class Tokenizer {
                 consumeNumber();
                 return;
             }
-        }
-
-        if (c == ':' && isLowAlpha(peek())) {
+        } else if (c == ':' && isLowAlpha(peek())) {
             consumeArgument();
             return;
-        }
-
-        if (isOperatorCharacter(c)) {
+        } else if (isOperatorCharacter(c)) {
             consumeOperator();
             return;
+        } else if (isBigAlpha(c)) {
+            consumeKeywordOrIdentifier(false);
+            return;
+        } else if (isLowAlpha(c)){
+            consumeKeywordOrIdentifier(true);
+            return;
         }
+
+        throw new UnexpectedTokenException(addToken(TokenType.UNEXPECTED));
     }
 
     private Token addToken(TokenType type) {
@@ -259,6 +261,32 @@ public class Tokenizer {
         }
 
         addToken(TokenType.OPERATOR);
+    }
+
+    private void consumeKeywordOrIdentifier(boolean first_kw){
+        while (isAlphaNumUnderscore(peek())) {
+            advance();
+        }
+
+        if (peek() == ':'){
+            advance();
+            String content = source.substring(start_char_index, current_char_index - 1);
+
+            if (first_kw) {
+                addToken(TokenType.FIRST_KW, content);
+            }else {
+                addToken(TokenType.KEYWORD, content);
+            }
+            return;
+        }
+
+        String content = source.substring(start_char_index, current_char_index);
+        if (content.equals("self")) {
+            addToken(TokenType.SELF, content);
+            return;
+        }
+
+        addToken(TokenType.IDENTIFIER, content);
     }
 
 }
