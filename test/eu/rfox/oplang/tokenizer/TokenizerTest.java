@@ -61,4 +61,72 @@ public class TokenizerTest {
 
         assertEquals(tokens.get(3).type, TokenType.EOF);
     }
+
+    @Test
+    public void consumeComment() throws TokenizerException {
+        Tokenizer t = new Tokenizer("1 # comment\n");
+        ArrayList<Token> tokens = t.tokenize();
+
+        Token number = tokens.get(0);
+        assertEquals(number.type, TokenType.NUMBER);
+        assertEquals(number.content, "1");
+
+        Token comment = tokens.get(1);
+        assertEquals(comment.type, TokenType.COMMENT);
+        assertEquals(comment.content, "# comment");
+
+        assertEquals(tokens.get(2).type, TokenType.EOF);
+    }
+
+    @Test
+    public void consumeCommentWithEOF() throws TokenizerException {
+        Tokenizer t = new Tokenizer("1 # comment");
+        ArrayList<Token> tokens = t.tokenize();
+
+        Token number = tokens.get(0);
+        assertEquals(number.type, TokenType.NUMBER);
+        assertEquals(number.content, "1");
+
+        Token comment = tokens.get(1);
+        assertEquals(comment.type, TokenType.COMMENT);
+        assertEquals(comment.content, "# comment");
+
+        assertEquals(tokens.get(2).type, TokenType.EOF);
+    }
+
+    @Test
+    public void consumeArgument() throws TokenizerException {
+        Tokenizer t = new Tokenizer(" :something ");
+        ArrayList<Token> tokens = t.tokenize();
+
+        Token argument = tokens.get(0);
+        assertEquals(argument.type, TokenType.ARGUMENT);
+        assertEquals(argument.content, "something");
+
+        assertEquals(tokens.get(1).type, TokenType.EOF);
+    }
+
+    @Test
+    public void consumeOperator() throws TokenizerException {
+        Tokenizer t = new Tokenizer("= == != +");
+        ArrayList<Token> tokens = t.tokenize();
+
+        Token assignment = tokens.get(0);
+        assertEquals(assignment.type, TokenType.ASSIGNMENT);
+        assertEquals(assignment.content, "=");
+
+        Token operator = tokens.get(1);
+        assertEquals(operator.type, TokenType.OPERATOR);
+        assertEquals(operator.content, "==");
+
+        operator = tokens.get(2);
+        assertEquals(operator.type, TokenType.OPERATOR);
+        assertEquals(operator.content, "!=");
+
+        operator = tokens.get(3);
+        assertEquals(operator.type, TokenType.OPERATOR);
+        assertEquals(operator.content, "+");
+
+        assertEquals(tokens.get(4).type, TokenType.EOF);
+    }
 }

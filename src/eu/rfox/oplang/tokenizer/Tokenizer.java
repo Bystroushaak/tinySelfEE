@@ -42,6 +42,13 @@ public class Tokenizer {
 
     private void scanToken() throws UnterminatedStringException {
         char c = advance();
+
+        // handle case of == which would have been caught in the switch next
+        if (c == '=' && (peek() == '=' || isOperatorCharacter(peek()))) {
+            consumeOperator();
+            return;
+        }
+
         switch (c) {
             case '(':
                 addToken(TokenType.OBJ_START);
@@ -76,6 +83,9 @@ public class Tokenizer {
             case '\'':
                 consumeString(TokenType.SINGLE_Q_STRING);
                 return;
+            case '#':
+                consumeComment();
+                return;
             case ' ':
             case '\r':
             case '\t':
@@ -91,14 +101,22 @@ public class Tokenizer {
 
         if (isDigit(c)) {
             if (peek() == 'x' || peek() == 'X') {
-                advance();
-                advance();
                 consumeHexNumber();
                 return;
             } else {
                 consumeNumber();
                 return;
             }
+        }
+
+        if (c == ':' && isLowAlpha(peek())) {
+            consumeArgument();
+            return;
+        }
+
+        if (isOperatorCharacter(c)) {
+            consumeOperator();
+            return;
         }
     }
 
@@ -153,6 +171,9 @@ public class Tokenizer {
     }
 
     private void consumeHexNumber() {
+        advance();
+        advance();
+
         while (isHexNum(peek())) {
             advance();
         }
@@ -166,8 +187,8 @@ public class Tokenizer {
 
     private void consumeNumber() {
         boolean float_number = false;
-        while (isDigit(peek()) || (! float_number && (peek() == '.' && isDigit(peekTwo())))) {
-            if (advance() == '.'){
+        while (isDigit(peek()) || (!float_number && (peek() == '.' && isDigit(peekTwo())))) {
+            if (advance() == '.') {
                 float_number = true;
             }
         }
@@ -178,4 +199,66 @@ public class Tokenizer {
             addToken(TokenType.NUMBER);
         }
     }
+
+    private void consumeComment() {
+        while (peek() != '\n' && peek() != '\0') {
+            advance();
+        }
+
+        addToken(TokenType.COMMENT);
+    }
+
+    private boolean isLowAlpha(char c) {
+        return c >= 'a' && c <= 'z';
+    }
+
+    private boolean isBigAlpha(char c) {
+        return c >= 'A' && c <= 'Z';
+    }
+
+    private boolean isAlphaNumUnderscore(char c) {
+        return isLowAlpha(c) || isBigAlpha(c) || isDigit(c) || c == '_';
+    }
+
+    private void consumeArgument() {
+        start_char_index++;  // ignore : at the beginning
+        advance();
+
+        while (isAlphaNumUnderscore(peek())) {
+            advance();
+        }
+
+        addToken(TokenType.ARGUMENT);
+    }
+
+    private boolean isOperatorCharacter(char c) {
+        switch (c) {
+            case '!':
+            case '@':
+            case '$':
+            case '%':
+            case '&':
+            case '*':
+            case '-':
+            case '+':
+            case '/':
+            case '~':
+            case '?':
+            case '<':
+            case '>':
+            case ',':
+                return true;
+        }
+
+        return false;
+    }
+
+    private void consumeOperator() {
+        while (peek() == '=' || isOperatorCharacter(peek())) {
+            advance();
+        }
+
+        addToken(TokenType.OPERATOR);
+    }
+
 }
