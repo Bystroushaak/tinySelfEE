@@ -7,6 +7,29 @@ import java.util.ArrayList;
 import static org.junit.Assert.*;
 
 public class TokenizerTest {
+    @Test
+    public void consumeDoubleQuoteString() throws TokenizerException {
+        Tokenizer t = new Tokenizer("\"some string\"");
+        ArrayList<Token> tokens = t.tokenize();
+
+        Token str = tokens.get(0);
+        assertEquals(str.type, TokenType.DOUBLE_Q_STRING);
+        assertEquals(str.content, "some string");
+
+        assertEquals(tokens.get(1).type, TokenType.EOF);
+    }
+
+    @Test
+    public void consumeSingleQuoteString() throws TokenizerException {
+        Tokenizer t = new Tokenizer("'some string'");
+        ArrayList<Token> tokens = t.tokenize();
+
+        Token str = tokens.get(0);
+        assertEquals(str.type, TokenType.DOUBLE_Q_STRING);
+        assertEquals(str.content, "some string");
+
+        assertEquals(tokens.get(1).type, TokenType.EOF);
+    }
 
     @Test
     public void consumeHexNumber() throws TokenizerException {
