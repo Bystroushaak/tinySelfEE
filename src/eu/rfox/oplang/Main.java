@@ -2,8 +2,12 @@ package eu.rfox.oplang;
 
 import eu.rfox.oplang.parser.Parser;
 import eu.rfox.oplang.parser.ast.ASTItem;
+import eu.rfox.oplang.tokenizer.TokenType;
 import eu.rfox.oplang.tokenizer.TokenizerException;
+import eu.rfox.oplang.tokenizer.UnexpectedTokenException;
+import eu.rfox.oplang.tokenizer.UnterminatedStringException;
 
+import java.util.List;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.nio.file.Files;
@@ -31,10 +35,27 @@ public class Main {
 
     private static void runFile(String file_path) throws IOException, TokenizerException {
         byte[] bytes = Files.readAllBytes(Paths.get(file_path));
-        ArrayList<ASTItem> ast = Parser.parse(new String(bytes, StandardCharsets.UTF_8));
+        String source_code = new String(bytes, StandardCharsets.UTF_8);
 
-        for (ASTItem item: ast) {
-            System.out.println(item.toString());
+        try {
+            ArrayList<ASTItem> ast = Parser.parse(source_code);
+
+            for (ASTItem item : ast) {
+                System.out.println(item.toString());
+            }
+        } catch (UnexpectedTokenException e) {
+            System.err.println("Unexpected token `" + e.token.content + "` on line " + e.token.line + ";");
+            String[] lines = source_code.split(System.getProperty("line.separator"));
+            System.err.println(lines[e.token.line - 1]);
+
+            for (int i = 0; i < e.token.start; i++) {
+                System.err.print("-");
+            }
+            System.err.println("^");
+        } catch (UnterminatedStringException e) {
+            System.err.println("Unterminated string on line " + e.token.line + ":\n" + e.token.content);
+        } catch (TokenizerException e) {
+            System.err.println("Invalid token: " + e.token.toString());
         }
     }
 

@@ -148,6 +148,7 @@ public class Tokenizer {
     }
 
     private void consumeString(TokenType token_type) throws UnterminatedStringException {
+        int line_start = last_lineno;  // for unterminated strings
         char end_char = token_type == TokenType.DOUBLE_Q_STRING ? '"' : '\'';
 
         while (peek() != end_char && !isAtEnd()) {
@@ -160,7 +161,9 @@ public class Tokenizer {
         }
 
         if (isAtEnd()) {
-            throw new UnterminatedStringException(addToken(token_type));
+            Token unterminated_string_token = addToken(token_type);
+            unterminated_string_token.line = line_start;
+            throw new UnterminatedStringException(unterminated_string_token);
         }
 
         advance();
