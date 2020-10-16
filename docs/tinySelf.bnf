@@ -2,10 +2,9 @@ root : expression |
        expression END_OF_EXPR |
        expression END_OF_EXPR root
 
-numbers : NUMBER
 strings : SINGLE_Q_STRING | DOUBLE_Q_STRING
 
-expression : SELF | strings | numbers | message | cascade | obj | block
+expression : SELF | strings | NUMBER | message | cascade | obj | block
              RETURN expression |
              OBJ_START message OBJ_END |
              COMMENT expression |
