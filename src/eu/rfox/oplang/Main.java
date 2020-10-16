@@ -2,12 +2,10 @@ package eu.rfox.oplang;
 
 import eu.rfox.oplang.parser.Parser;
 import eu.rfox.oplang.parser.ast.ASTItem;
-import eu.rfox.oplang.tokenizer.TokenType;
 import eu.rfox.oplang.tokenizer.TokenizerException;
 import eu.rfox.oplang.tokenizer.UnexpectedTokenException;
 import eu.rfox.oplang.tokenizer.UnterminatedStringException;
 
-import java.util.List;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.nio.file.Files;
@@ -38,7 +36,8 @@ public class Main {
         String source_code = new String(bytes, StandardCharsets.UTF_8);
 
         try {
-            ArrayList<ASTItem> ast = Parser.parse(source_code);
+            Parser parser = new Parser(source_code);
+            ArrayList<ASTItem> ast = parser.parse();
 
             for (ASTItem item : ast) {
                 System.out.println(item.toString());
