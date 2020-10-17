@@ -2,14 +2,20 @@ root : expression |
        expression END_OF_EXPR |
        expression END_OF_EXPR root
 
-strings : SINGLE_Q_STRING | DOUBLE_Q_STRING
 
-expression : SELF | strings | NUMBER | message | cascade | obj | block
+
+expression : literals | message | cascade | obj | block
              RETURN expression |
              OBJ_START message OBJ_END |
              COMMENT expression |
              expression COMMENT |
              COMMENT
+
+literals: SELF, strings, NUMBER
+
+strings : SINGLE_Q_STRING | DOUBLE_Q_STRING
+
+message : unary_message | binary_message | keyword_msg
 
 unary_message : expression IDENTIFIER |
                 IDENTIFIER
@@ -17,15 +23,13 @@ unary_message : expression IDENTIFIER |
 binary_message : expression OPERATOR expression |
                  expression ASSIGNMENT expression
 
-kwd : KEYWORD expression |
-      KEYWORD expression kwd
-
 keyword_msg : FIRST_KW expression |
               expression FIRST_KW expression |
               FIRST_KW expression kwd |
               expression FIRST_KW expression kwd
 
-message : unary_message | binary_message | keyword_msg
+kwd : KEYWORD expression |
+      KEYWORD expression kwd
 
 cascade : message CASCADE message |
           message CASCADE cascade
@@ -40,19 +44,18 @@ slot_definition : slot_name |
 slot_kwd : KEYWORD IDENTIFIER |
            KEYWORD IDENTIFIER slot_kwd
 
-kw_slot_name : FIRST_KW IDENTIFIER |
-               FIRST_KW IDENTIFIER slot_kwd
 
-slot_definition : kw_slot_name ASSIGNMENT expression
-op_slot_name : OPERATOR IDENTIFIER |
-               ASSIGNMENT IDENTIFIER
-slot_definition : op_slot_name ASSIGNMENT expression |
+
+slot_definition : kw_slot_name ASSIGNMENT expression |
+                  op_slot_name ASSIGNMENT expression |
                   slot_definition END_OF_EXPR |
                   slot_definition END_OF_EXPR slot_definition
 
-code : expression |
-       expression END_OF_EXPR |
-       expression END_OF_EXPR code
+kw_slot_name : FIRST_KW IDENTIFIER |
+               FIRST_KW IDENTIFIER slot_kwd
+
+op_slot_name : OPERATOR IDENTIFIER |
+               ASSIGNMENT IDENTIFIER
 
 obj : OBJ_START OBJ_END |
       OBJ_START SEPARATOR OBJ_END |
@@ -73,3 +76,7 @@ block : BLOCK_START BLOCK_END |
         BLOCK_START SEPARATOR slot_definition SEPARATOR BLOCK_END |
         BLOCK_START slot_definition SEPARATOR code BLOCK_END |
         BLOCK_START SEPARATOR slot_definition SEPARATOR code BLOCK_END
+
+code : expression |
+       expression END_OF_EXPR |
+       expression END_OF_EXPR code
