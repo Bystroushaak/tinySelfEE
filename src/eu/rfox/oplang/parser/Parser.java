@@ -30,7 +30,7 @@ public class Parser {
 //        }
 
         while (!isAtEnd()) {
-            ast.add(parseMessage());
+            ast.add(parseCascade());
         }
 
         return ast;
@@ -42,6 +42,10 @@ public class Parser {
 
         if (isMessage()) {
             return parseMessage();
+        }
+
+        if (isCascade()) {
+            return parseCascade();
         }
 
         advance();
@@ -105,27 +109,15 @@ public class Parser {
     }
 
     private boolean isUnaryMessage() {
-        if (check_current(TokenType.IDENTIFIER) || check_next(TokenType.IDENTIFIER)) {
-            return true;
-        }
-
-        return false;
+        return check_current(TokenType.IDENTIFIER) || check_next(TokenType.IDENTIFIER);
     }
 
     private boolean isBinaryMessage() {
-        if (check_next(TokenType.OPERATOR, TokenType.ASSIGNMENT)) {
-            return true;
-        }
-
-        return false;
+        return check_next(TokenType.OPERATOR, TokenType.ASSIGNMENT);
     }
 
     private boolean isKeywordMessage() {
-        if (check_current(TokenType.FIRST_KW) || check_next(TokenType.FIRST_KW)) {
-            return true;
-        }
-
-        return false;
+        return check_current(TokenType.FIRST_KW) || check_next(TokenType.FIRST_KW);
     }
 
     private ASTItem parseUnaryMessage() {
@@ -162,6 +154,33 @@ public class Parser {
 
     private KeywordPair parseSingleKeywordPair() {
         return new KeywordPair(advance().content, parseExpression());
+    }
+
+    private boolean isCascade() {
+        return check_current(TokenType.CASCADE);
+    }
+
+    private ASTItem parseCascade() {
+        ASTItem expr = parseMessage();
+
+        if (check_current(TokenType.CASCADE)) {
+            Send first_send = (Send) expr;
+            Cascade cascade = new Cascade(first_send.obj, first_send.message);
+
+            advance(); // consume cascade token
+            Send another_send = (Send) parseMessage();
+            cascade.addMessage(another_send.message);
+
+            while (isCascade()) {
+                advance(); // consume cascade token
+                another_send = (Send) parseMessage();
+                cascade.addMessage(another_send.message);
+            }
+
+            return cascade;
+        }
+
+        return expr;
     }
 
     private boolean match_any(TokenType... types) {

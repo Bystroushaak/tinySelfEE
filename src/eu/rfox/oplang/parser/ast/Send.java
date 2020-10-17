@@ -2,18 +2,18 @@ package eu.rfox.oplang.parser.ast;
 
 import java.util.Objects;
 
-public class Send implements ASTItem {
-    ASTItem obj;
-    MessageBase msg;
+public class Send extends SendBase implements ASTItem {
+    public ASTItem obj;
+    public MessageBase message;
 
-    public Send(MessageBase msg) {
+    public Send(MessageBase message) {
         this.obj = new Self();
-        this.msg = msg;
+        this.message = message;
     }
 
-    public Send(ASTItem obj, MessageBase msg) {
+    public Send(ASTItem obj, MessageBase message) {
         this.obj = obj;
-        this.msg = msg;
+        this.message = message;
     }
 
     public <R> R accept(Visitor<R> visitor) {
@@ -26,19 +26,19 @@ public class Send implements ASTItem {
         if (o == null || getClass() != o.getClass()) return false;
         Send send = (Send) o;
         return Objects.equals(obj, send.obj) &&
-                Objects.equals(msg, send.msg);
+                Objects.equals(message, send.message);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(obj, msg);
+        return Objects.hash(obj, message);
     }
 
     @Override
     public String toString() {
         return "Send{" +
                 "obj=" + obj.toString() +
-                ", msg=" + msg.toString() +
+                ", message=" + message.toString() +
                 '}';
     }
 }

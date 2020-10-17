@@ -66,7 +66,7 @@ public class ParserTest {
         ArrayList<ASTItem> ast = p.parse();
 
         assertEquals(ast.get(0), new Send(new NumberInt(1),
-                new MessageUnary("message")));
+                                          new MessageUnary("message")));
     }
 
     @Test
@@ -75,7 +75,7 @@ public class ParserTest {
         ArrayList<ASTItem> ast = p.parse();
 
         assertEquals(ast.get(0), new Send(new NumberInt(1),
-                new MessageBinary("+", new NumberInt(2))));
+                                          new MessageBinary("+", new NumberInt(2))));
     }
 
     @Test
@@ -84,7 +84,7 @@ public class ParserTest {
         ArrayList<ASTItem> ast = p.parse();
 
         assertEquals(ast.get(0), new Send(new NumberInt(1),
-                new MessageKeyword("send:", new NumberInt(2))));
+                                          new MessageKeyword("send:", new NumberInt(2))));
     }
 
     @Test
@@ -95,5 +95,15 @@ public class ParserTest {
         ArrayList<ASTItem> parameters = new ArrayList<ASTItem>(Arrays.asList(new NumberInt(2), new NumberInt(3)));
         MessageKeyword msg = new MessageKeyword("send:And:", parameters);
         assertEquals(ast.get(0), new Send(new NumberInt(1), msg));
+    }
+
+    @Test
+    public void parseCascade() throws TokenizerException, ParserException {
+        Parser p = new Parser("1 msg; another");
+        ArrayList<ASTItem> ast = p.parse();
+
+        ArrayList<MessageBase> messages = new ArrayList<>(Arrays.asList(new MessageUnary("msg"),
+                                                                        new MessageUnary("another")));
+        assertEquals(ast.get(0), new Cascade(new NumberInt(1), messages));
     }
 }
