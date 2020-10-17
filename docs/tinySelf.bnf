@@ -44,8 +44,6 @@ slot_definition : slot_name |
 slot_kwd : KEYWORD IDENTIFIER |
            KEYWORD IDENTIFIER slot_kwd
 
-
-
 slot_definition : kw_slot_name ASSIGNMENT expression |
                   op_slot_name ASSIGNMENT expression |
                   slot_definition END_OF_EXPR |
