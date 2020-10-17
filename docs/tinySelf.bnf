@@ -4,7 +4,11 @@ root : expression |
 
 
 
-expression : literals | message | cascade | obj | block
+expression : literals |
+             message |
+             cascade |
+             obj |
+             block |
              RETURN expression |
              OBJ_START message OBJ_END |
              COMMENT expression |

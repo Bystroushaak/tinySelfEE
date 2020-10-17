@@ -36,13 +36,19 @@ public class Parser {
         return ast;
     }
 
-//    private Root parseRoot() {
-//        if (peek() == TokenType.EOF) {
-//            return Root(advance())
-//        }
-//    }
-
     private ASTItem parseExpression() {
+        ASTItem literal = parseLiterals();
+        if (literal != null) return literal;
+
+        if (isMessage()) {
+            return parseMessage();
+        }
+
+        advance();
+        return parseExpression();
+    }
+
+    private ASTItem parseLiterals() {
         switch (current().type) {
             case SELF:
                 return parseSelf();
@@ -56,11 +62,7 @@ public class Parser {
 //            case NUMBER_HEX:
 //                return parseHexNumber();
         }
-
-        return parseMessage();
-//
-//        advance();
-//        return new Nil();
+        return null;
     }
 
     private ASTItem parseSelf() {
@@ -87,13 +89,11 @@ public class Parser {
     }
 
     private ASTItem parseMessage() {
-        if (isBinaryMessage()) {
-            return parseBinaryMessage();
-        }
         if (isUnaryMessage()) {
             return parseUnaryMessage();
-        }
-        if (isKeywordMessage()) {
+        } else if (isBinaryMessage()) {
+            return parseBinaryMessage();
+        } else if (isKeywordMessage()) {
             return parseKeywordMessage();
         }
 
@@ -143,10 +143,25 @@ public class Parser {
 
     private ASTItem parseKeywordMessage() {
         if (check_current(TokenType.FIRST_KW)) {
-            return new Send(new MessageKeyword(advance().content, parseExpression()));
+            MessageKeyword kwd_msg = new MessageKeyword(advance().content, parseExpression());
+            return new Send(tryConsumeKeywordPairs(kwd_msg));
         }
 
-        return new Send(parseExpression(), new MessageKeyword(advance().content, parseExpression()));
+        ASTItem expr = parseExpression();
+        MessageKeyword kwd_msg = new MessageKeyword(advance().content, parseExpression());
+        return new Send(expr, tryConsumeKeywordPairs(kwd_msg));
+    }
+
+    private MessageKeyword tryConsumeKeywordPairs(MessageKeyword kwd_msg) {
+        while (check_current(TokenType.KEYWORD)) {
+            kwd_msg.addPair(parseSingleKeywordPair());
+        }
+
+        return kwd_msg;
+    }
+
+    private KeywordPair parseSingleKeywordPair() {
+        return new KeywordPair(advance().content, parseExpression());
     }
 
     private boolean match_any(TokenType... types) {
