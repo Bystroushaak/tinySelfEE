@@ -25,7 +25,7 @@ public class TokenizerTest {
         ArrayList<Token> tokens = t.tokenize();
 
         Token str = tokens.get(0);
-        assertEquals(str.type, TokenType.DOUBLE_Q_STRING);
+        assertEquals(str.type, TokenType.SINGLE_Q_STRING);
         assertEquals(str.content, "some string");
 
         assertEquals(tokens.get(1).type, TokenType.EOF);
@@ -195,16 +195,16 @@ public class TokenizerTest {
         ArrayList<Token> tokens = t.tokenize();
 
         Token self = tokens.get(0);
-        assertEquals(self.type, TokenType.IDENTIFIER);
-        assertEquals(self.content, "Someth1n_g");
+        assertEquals(self.type, TokenType.SELF);
+        assertEquals(self.content, "self");
 
         Token identifier = tokens.get(1);
         assertEquals(identifier.type, TokenType.IDENTIFIER);
         assertEquals(identifier.content, "Someth1n_g");
 
         self = tokens.get(2);
-        assertEquals(self.type, TokenType.IDENTIFIER);
-        assertEquals(self.content, "Someth1n_g");
+        assertEquals(self.type, TokenType.SELF);
+        assertEquals(self.content, "self");
 
         assertEquals(tokens.get(3).type, TokenType.EOF);
     }
