@@ -160,7 +160,7 @@ public class TokenizerTest {
 
         Token keyword = tokens.get(0);
         assertEquals(keyword.type, TokenType.FIRST_KW);
-        assertEquals(keyword.content, "something");
+        assertEquals(keyword.content, "something:");
 
         assertEquals(tokens.get(1).type, TokenType.EOF);
     }
@@ -172,7 +172,7 @@ public class TokenizerTest {
 
         Token keyword = tokens.get(0);
         assertEquals(keyword.type, TokenType.KEYWORD);
-        assertEquals(keyword.content, "Something");
+        assertEquals(keyword.content, "Something:");
 
         assertEquals(tokens.get(1).type, TokenType.EOF);
     }

@@ -273,7 +273,7 @@ public class Tokenizer {
 
         if (peek() == ':'){
             advance();
-            String content = source.substring(start_char_index, current_char_index - 1);
+            String content = source.substring(start_char_index, current_char_index);
 
             if (first_kw) {
                 addToken(TokenType.FIRST_KW, content);
