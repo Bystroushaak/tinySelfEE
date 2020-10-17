@@ -117,4 +117,12 @@ public class ParserTest {
                                                                         new MessageKeyword("keyword:", new NumberInt(1))));
         assertEquals(ast.get(0), new Cascade(new NumberInt(1), messages));
     }
+
+    @Test
+    public void parseReturn() throws TokenizerException, ParserException {
+        Parser p = new Parser("^ 1");
+        ArrayList<ASTItem> ast = p.parse();
+
+        assertEquals(ast.get(0), new Return(new NumberInt(1)));
+    }
 }

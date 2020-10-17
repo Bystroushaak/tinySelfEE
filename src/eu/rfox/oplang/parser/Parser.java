@@ -63,6 +63,10 @@ public class Parser {
                 return parseInt();
             case NUMBER_FLOAT:
                 return parseFloat();
+            case COMMENT:
+                return parseComment();
+            case RETURN:
+                return parseReturn();
 //            case NUMBER_HEX:
 //                return parseHexNumber();
         }
@@ -90,6 +94,15 @@ public class Parser {
 
     private ASTItem parseFloat() {
         return new NumberFloat(Float.parseFloat(advance().content));
+    }
+
+    private ASTItem parseComment() {
+        return new Comment(advance().content);
+    }
+
+    private ASTItem parseReturn() {
+        advance();
+        return new Return(parseExpression());
     }
 
     private ASTItem parseMessage() {
