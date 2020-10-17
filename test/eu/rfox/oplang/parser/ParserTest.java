@@ -106,4 +106,15 @@ public class ParserTest {
                                                                         new MessageUnary("another")));
         assertEquals(ast.get(0), new Cascade(new NumberInt(1), messages));
     }
+
+    @Test
+    public void parseMultiCascade() throws TokenizerException, ParserException {
+        Parser p = new Parser("1 msg; another; keyword: 1");
+        ArrayList<ASTItem> ast = p.parse();
+
+        ArrayList<MessageBase> messages = new ArrayList<>(Arrays.asList(new MessageUnary("msg"),
+                                                                        new MessageUnary("another"),
+                                                                        new MessageKeyword("keyword:", new NumberInt(1))));
+        assertEquals(ast.get(0), new Cascade(new NumberInt(1), messages));
+    }
 }
