@@ -1,4 +1,12 @@
 package eu.rfox.oplang.parser.ast;
 
-public class Nil extends Self {
+import eu.rfox.oplang.tokenizer.Token;
+
+public class Nil implements ASTItem {
+    public Nil() {
+    }
+
+    public <R> R accept(Visitor<R> visitor) {
+        return visitor.visitNil(this);
+    }
 }
