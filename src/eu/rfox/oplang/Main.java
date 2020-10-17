@@ -1,6 +1,7 @@
 package eu.rfox.oplang;
 
 import eu.rfox.oplang.parser.Parser;
+import eu.rfox.oplang.parser.ParserException;
 import eu.rfox.oplang.parser.ast.ASTItem;
 import eu.rfox.oplang.tokenizer.TokenizerException;
 import eu.rfox.oplang.tokenizer.UnexpectedTokenException;
@@ -15,7 +16,7 @@ import java.nio.charset.StandardCharsets;
 public class Main {
     private static boolean hadError;
 
-    public static void main(String[] args) throws IOException, TokenizerException {
+    public static void main(String[] args) throws IOException, TokenizerException, ParserException {
         if (args.length > 1) {
             System.err.println("Usage: oplang [script]");
             System.exit(1);
@@ -31,7 +32,7 @@ public class Main {
         System.exit(1);
     }
 
-    private static void runFile(String file_path) throws IOException, TokenizerException {
+    private static void runFile(String file_path) throws IOException, TokenizerException, ParserException {
         byte[] bytes = Files.readAllBytes(Paths.get(file_path));
         String source_code = new String(bytes, StandardCharsets.UTF_8);
 
