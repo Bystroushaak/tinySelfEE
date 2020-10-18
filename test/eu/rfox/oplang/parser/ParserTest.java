@@ -125,4 +125,63 @@ public class ParserTest {
 
         assertEquals(ast.get(0), new Return(new NumberInt(1)));
     }
+
+    @Test
+    public void parseEmptyObject() throws TokenizerException, ParserException {
+        Parser p = new Parser("()");
+        ArrayList<ASTItem> ast = p.parse();
+
+        assertEquals(ast.get(0), new Obj());
+    }
+
+    @Test
+    public void parseEmptyObjectWithOneSeparator() throws TokenizerException, ParserException {
+        Parser p = new Parser("(|)");
+        ArrayList<ASTItem> ast = p.parse();
+
+        assertEquals(ast.get(0), new Obj());
+    }
+
+    @Test
+    public void parseEmptyObjectWithTwoSeparators() throws TokenizerException, ParserException {
+        Parser p = new Parser("(||)");
+        ArrayList<ASTItem> ast = p.parse();
+
+        assertEquals(ast.get(0), new Obj());
+    }
+
+    @Test
+    public void parseEmptyObjectWithCode() throws TokenizerException, ParserException {
+        Parser p = new Parser("(|| 1 asd)");
+        ArrayList<ASTItem> ast = p.parse();
+
+        Obj o = new Obj();
+        o.addCode(new Send(new NumberInt(1), new MessageUnary("asd")));
+
+        assertEquals(ast.get(0), o);
+    }
+
+    @Test
+    public void parseEmptyObjectWithMultipleCodeExpr() throws TokenizerException, ParserException {
+        Parser p = new Parser("(|| 1 asd. 2 xxx)");
+        ArrayList<ASTItem> ast = p.parse();
+
+        Obj o = new Obj();
+        o.addCode(new Send(new NumberInt(1), new MessageUnary("asd")));
+        o.addCode(new Send(new NumberInt(2), new MessageUnary("xxx")));
+
+        assertEquals(ast.get(0), o);
+    }
+
+    @Test
+    public void parseEmptyObjectWithMultipleCodeAndDotAtTheEnd() throws TokenizerException, ParserException {
+        Parser p = new Parser("(|| 1 asd. 2 xxx.)");
+        ArrayList<ASTItem> ast = p.parse();
+
+        Obj o = new Obj();
+        o.addCode(new Send(new NumberInt(1), new MessageUnary("asd")));
+        o.addCode(new Send(new NumberInt(2), new MessageUnary("xxx")));
+
+        assertEquals(ast.get(0), o);
+    }
 }

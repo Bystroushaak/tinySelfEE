@@ -30,7 +30,7 @@ public class Parser {
 //        }
 
         while (!isAtEnd()) {
-            ast.add(parseCascade());
+            ast.add(parseObject());
         }
 
         return ast;
@@ -48,8 +48,12 @@ public class Parser {
             return parseCascade();
         }
 
+        if (isObject()) {
+            return parseObject();
+        }
+
         advance();
-        return parseExpression();
+        return parseObject();
     }
 
     private ASTItem parseLiterals() {
@@ -143,7 +147,7 @@ public class Parser {
 
     private ASTItem parseBinaryMessage() {
         return new Send(parseExpression(), new MessageBinary(advance().content,
-                parseExpression()));
+                                                             parseExpression()));
     }
 
     private ASTItem parseKeywordMessage() {
@@ -194,6 +198,56 @@ public class Parser {
         }
 
         return expr;
+    }
+
+    private boolean isObject() {
+        return check_current(TokenType.OBJ_START);
+    }
+
+    private ASTItem parseObject() {
+        if (!isObject()) {
+            return parseCascade();
+        }
+        advance();
+
+        if (check_current(TokenType.OBJ_END)) {
+            advance();
+            return new Obj();
+        } else if (check_current(TokenType.SEPARATOR) && check_next(TokenType.OBJ_END)) {
+            advance();
+            advance();
+            return new Obj();
+        } else if (check_current(TokenType.SEPARATOR) && check_next(TokenType.SEPARATOR)) {
+            advance();
+            advance();
+
+            if (check_current(TokenType.OBJ_END)) {
+                advance();
+                return new Obj();
+            }
+
+            Obj obj = parseCode(new Obj());
+            advance();
+            return obj;
+        }
+
+        advance();
+        return null;
+    }
+
+    private Obj parseCode(Obj obj) {
+        obj.addCode(parseObject());
+
+        while (check_current(TokenType.END_OF_EXPR)) {
+            advance();
+            if (check_current(TokenType.OBJ_END)) {
+                return obj;
+            }
+
+            obj.addCode(parseObject());
+        }
+
+        return obj;
     }
 
     private boolean match_any(TokenType... types) {
