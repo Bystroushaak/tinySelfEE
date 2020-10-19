@@ -19,4 +19,9 @@ public class Self implements ASTItem {
 
         return false;
     }
+
+    @Override
+    public String toString() {
+        return "Self{}";
+    }
 }

@@ -186,7 +186,7 @@ public class ParserTest {
     }
 
     @Test
-    public void parseObjectSlot() throws TokenizerException, ParserException {
+    public void parseObjectWithSlot() throws TokenizerException, ParserException {
         Parser p = new Parser("(| asd |)");
         ArrayList<ASTItem> ast = p.parse();
 
@@ -197,7 +197,7 @@ public class ParserTest {
     }
 
     @Test
-    public void parseObjectSlotAssign() throws TokenizerException, ParserException {
+    public void parseObjectWithSlotAssign() throws TokenizerException, ParserException {
         Parser p = new Parser("(| asd = 1 |)");
         ArrayList<ASTItem> ast = p.parse();
 
@@ -208,7 +208,7 @@ public class ParserTest {
     }
 
     @Test
-    public void parseObjectSlotMultiple() throws TokenizerException, ParserException {
+    public void parseObjectWithMultipleSlots() throws TokenizerException, ParserException {
         Parser p = new Parser("(| xxx. asd = 1. |)");
         ArrayList<ASTItem> ast = p.parse();
 
@@ -220,7 +220,7 @@ public class ParserTest {
     }
 
     @Test
-    public void parseObjectSlotMultipleWithKw() throws TokenizerException, ParserException {
+    public void parseObjectWithMultipleSlotsAndKw() throws TokenizerException, ParserException {
         Parser p = new Parser("(| xxx. asd = 1. keyword: a = (). |)");
         ArrayList<ASTItem> ast = p.parse();
 
@@ -233,6 +233,69 @@ public class ParserTest {
         o.addSlot("keyword:", obj_with_one_argument_a);
 
         assertEquals(ast.get(0), o);
+    }
+
+    @Test
+    public void parseObjectWithMultipleSlotsAndOperator() throws TokenizerException, ParserException {
+        Parser p = new Parser("(| xxx. asd = 1. keyword: a = (). == b = (). |)");
+        ArrayList<ASTItem> ast = p.parse();
+
+        Obj o = new Obj();
+        o.addSlot("xxx", new Nil());
+        o.addSlot("asd", new NumberInt(1));
+
+        Obj obj_with_one_argument_a = new Obj();
+        obj_with_one_argument_a.addArgument("a");
+        o.addSlot("keyword:", obj_with_one_argument_a);
+
+        Obj operator_obj = new Obj();
+        operator_obj.addArgument("b");
+        o.addSlot("==", operator_obj);
+
+        assertEquals(ast.get(0), o);
+    }
+
+    @Test
+    public void parseObjectWithSlotsAndCode() throws TokenizerException, ParserException {
+        Parser p = new Parser("(| xxx. asd = 1. | self xx)");
+        ArrayList<ASTItem> ast = p.parse();
+
+        Obj o = new Obj();
+        o.addSlot("xxx", new Nil());
+        o.addSlot("asd", new NumberInt(1));
+        o.addCode(new Send(new MessageUnary("xx")));
+
+        assertEquals(ast.get(0), o);
+    }
+
+    @Test
+    public void parseObjectWithSlotsAndMultipleCodeStatements() throws TokenizerException, ParserException {
+        Parser p = new Parser("(| xxx. asd = 1. | self xx. asd. ^ 1.)");
+        ArrayList<ASTItem> ast = p.parse();
+
+        Obj o = new Obj();
+        o.addSlot("xxx", new Nil());
+        o.addSlot("asd", new NumberInt(1));
+        o.addCode(new Send(new MessageUnary("xx")));
+        o.addCode(new Send(new MessageUnary("asd")));
+        o.addCode(new Return(new NumberInt(1)));
+
+        assertEquals(ast.get(0), o);
+    }
+
+    @Test
+    public void parseBlockWithSlotsAndMultipleCodeStatements() throws TokenizerException, ParserException {
+        Parser p = new Parser("[| xxx. asd = 1. | self xx. asd. ^ 1.]");
+        ArrayList<ASTItem> ast = p.parse();
+
+        Block b = new Block();
+        b.addSlot("xxx", new Nil());
+        b.addSlot("asd", new NumberInt(1));
+        b.addCode(new Send(new MessageUnary("xx")));
+        b.addCode(new Send(new MessageUnary("asd")));
+        b.addCode(new Return(new NumberInt(1)));
+
+        assertEquals(ast.get(0), b);
     }
 }
 
