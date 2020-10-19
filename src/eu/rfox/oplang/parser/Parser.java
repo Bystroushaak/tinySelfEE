@@ -27,6 +27,7 @@ public class Parser {
     private String source_code;
     private ArrayList<ASTItem> ast = new ArrayList<>();
     private ArrayList<ParserException> exceptions = new ArrayList<ParserException>();
+    public boolean hadError = false;
 
     private ArrayList<Token> tokens;
     private int current_token_index = 0;
@@ -43,7 +44,7 @@ public class Parser {
 //        }
 
         while (!isAtEnd()) {
-            ast.add(parseObject());
+            ast.add(parseObjectOrBlock());
         }
 
         return ast;
@@ -61,12 +62,12 @@ public class Parser {
             return parseCascade();
         }
 
-        if (isObject()) {
-            return parseObject();
+        if (isObjectOrBlock()) {
+            return parseObjectOrBlock();
         }
 
         advance();
-        return parseObject();
+        return parseObjectOrBlock();
     }
 
     private ASTItem parseLiterals() {
@@ -213,76 +214,84 @@ public class Parser {
         return expr;
     }
 
-    private boolean isObject() {
-        return check_current(TokenType.OBJ_START);
+    private boolean isObjectOrBlock() {
+        return check_current(TokenType.OBJ_START, TokenType.BLOCK_START);
     }
 
-    private ASTItem parseObject() {
-        if (!isObject()) {
-            return parseCascade();
+    private ASTItem parseObjectOrBlock() {
+        if (!isObjectOrBlock()) {
+            return parseCascade(); // go back to parseExpression() via the chain of other possible expr
         }
-        advance();
 
-        if (check_current(TokenType.OBJ_END)) {
+        Obj new_obj;
+        TokenType obj_end = TokenType.OBJ_END;
+        if (check_current(TokenType.OBJ_START)) {
+            new_obj = new Obj();
+        } else {
+            new_obj = new Block();
+            obj_end = TokenType.BLOCK_END;
+        }
+
+        advance();  // consume obj start
+
+        if (check_current(obj_end)) {
             advance();
-            return new Obj();
-        } else if (check_current(TokenType.SEPARATOR) && check_next(TokenType.OBJ_END)) {
+            return new_obj;
+        } else if (check_current(TokenType.SEPARATOR) && check_next(obj_end)) {
             advance();
             advance();
-            return new Obj();
+            return new_obj;
         } else if (check_current(TokenType.SEPARATOR) && check_next(TokenType.SEPARATOR)) {
             advance();
             advance();
 
-            if (check_current(TokenType.OBJ_END)) {
+            if (check_current(obj_end)) {
                 advance();
-                return new Obj();
+                return new_obj;
             }
 
-            Obj obj = parseCode(new Obj());
+            parseCode(new_obj, obj_end);
             advance();
-            return obj;
+            return new_obj;
         } else if (check_current(TokenType.SEPARATOR)) {
             advance();
-            Obj obj = parseSlotDefinition(new Obj());
+            parseSlotDefinition(new_obj, obj_end);
 
-            if (check_current(TokenType.OBJ_END)) {
+            if (check_current(obj_end)) {
                 advance();
-                return obj;
+                return new_obj;
             } else if (check_current(TokenType.SEPARATOR)) {
                 advance();
             }
 
-            if (check_current(TokenType.OBJ_END)) {
+            if (check_current(obj_end)) {
                 advance();
-                return obj;
+                return new_obj;
             }
 
-            parseCode(obj);
+            parseCode(new_obj, obj_end);
             advance();
-            return obj;
+            return new_obj;
         }
 
         advance();
         return null;
     }
 
-    private Obj parseCode(Obj obj) {
-        obj.addCode(parseObject());
+    private void parseCode(Obj obj, TokenType obj_end) {
+        obj.addCode(parseObjectOrBlock());
 
         while (check_current(TokenType.END_OF_EXPR)) {
             advance();
-            if (check_current(TokenType.OBJ_END)) {
-                return obj;
+            if (check_current(obj_end)) {
+                return;
             }
 
-            obj.addCode(parseObject());
+            obj.addCode(parseObjectOrBlock());
         }
-
-        return obj;
     }
 
-    private Obj parseSlotDefinition(Obj obj) {
+    private void parseSlotDefinition(Obj obj, TokenType obj_end) {
         while (check_current(TokenType.IDENTIFIER, TokenType.ARGUMENT, TokenType.FIRST_KW, TokenType.OPERATOR,
                              TokenType.ASSIGNMENT)) {
             consumeOneSlotArgument(obj);
@@ -291,16 +300,13 @@ public class Parser {
                 advance();
             }
 
-            if (check_current(TokenType.SEPARATOR, TokenType.OBJ_END)) {
-                return obj;
+            if (check_current(TokenType.SEPARATOR, obj_end)) {
+                return;
             }
         }
-
-        return obj;
     }
 
     private void consumeOneSlotArgument(Obj obj) {
-        String slot_name;
         String argument_name;
 
         if (check_current(TokenType.ARGUMENT)) {
@@ -311,21 +317,21 @@ public class Parser {
             argument_name = current().content;
             advance();
             advance();
-            obj.addSlot(argument_name, parseObject());
+            obj.addSlot(argument_name, parseObjectOrBlock());
             return;
         } else if (check_current(TokenType.IDENTIFIER) && check_next(TokenType.RW_ASSIGNMENT)) {
             argument_name = current().content;
             advance();
             advance();
-            obj.addSlot(argument_name, parseObject());
+            obj.addSlot(argument_name, parseObjectOrBlock());
             obj.addRWSlot(argument_name);
             return;
         } else if (check_current(TokenType.FIRST_KW)) {
             SlotnameAndArguments slot_args = consumeKeywordArguments(obj);
             advance();  // take assignment token
 
-            ASTItem code_obj = parseObject();
-            if (! (code_obj instanceof Obj)) {
+            ASTItem code_obj = parseObjectOrBlock();
+            if (!(code_obj instanceof Obj)) {
                 // TODO: can't assign arguments to non-code obj
                 return;
             }
@@ -334,18 +340,26 @@ public class Parser {
             obj.addSlot(slot_args.slot_name, code_obj);
             return;
         } else if (check_current(TokenType.OPERATOR, TokenType.ASSIGNMENT)) {
-            slot_name = current().content;
+            String slot_name = current().content;
             advance();
 
             if (!check_current(TokenType.IDENTIFIER)) {
                 // TODO: error handling - but maybe not, because arguments can be in obj
             }
 
-            obj.addArgument(current().content);
+            argument_name = current().content;
             advance();
 
             advance();  // take assignment token
-            obj.addSlot(slot_name, parseObject());
+
+            ASTItem code_obj = parseObjectOrBlock();
+            if (!(code_obj instanceof Obj)) {
+                // TODO: can't assign arguments to non-code obj
+                return;
+            }
+
+            ((Obj) code_obj).addArgument(argument_name);
+            obj.addSlot(slot_name, code_obj);
             return;
         } else if (check_current(TokenType.IDENTIFIER)) {
             obj.addSlot(current().content);

@@ -13,7 +13,6 @@ public class Obj implements ASTItem {
     public Obj() {
     }
 
-
     public void addCode(ASTItem expr) {
         if (code == null) {
             code = new ArrayList<>();
@@ -75,9 +74,13 @@ public class Obj implements ASTItem {
         return Objects.hash(slots, arguments, code, parents);
     }
 
+    private String objTypeForToString() {
+        return "Obj";
+    }
+
     @Override
     public String toString() {
-        return "Obj{" +
+        return objTypeForToString() + "{" +
                 "parents=" + parents +
                 ", slots=" + slots +
                 ", arguments=" + arguments +
