@@ -6,7 +6,7 @@ import java.util.Objects;
 
 public class Obj implements ASTItem {
     HashMap<String, ASTItem> slots;
-    ArrayList<ASTItem> parameters;  // TODO: maybe strings?
+    ArrayList<String> arguments;
     ArrayList<ASTItem> code;
     HashMap<String, Obj> parents;
 
@@ -22,6 +22,38 @@ public class Obj implements ASTItem {
         code.add(expr);
     }
 
+    public void addArgument(String name) {
+        if (arguments == null) {
+            arguments = new ArrayList<>();
+        }
+
+        arguments.add(name);
+    }
+
+    public void addArguments(ArrayList<String> arguments) {
+        if (this.arguments == null) {
+            this.arguments = arguments;
+            return;
+        }
+
+        this.arguments.addAll(arguments);
+    }
+
+    public void addSlot(String name) {
+        addSlot(name, new Nil());
+    }
+
+    public void addSlot(String name, ASTItem value) {
+        if (slots == null) {
+            slots = new HashMap<>();
+        }
+
+        slots.put(name, value);
+    }
+
+    public void addRWSlot(String name) {
+        addSlot(name, new AssignmentPrimitive());
+    }
 
     public <R> R accept(Visitor<R> visitor) {
         return visitor.visitObj(this);
@@ -33,23 +65,23 @@ public class Obj implements ASTItem {
         if (o == null || getClass() != o.getClass()) return false;
         Obj obj = (Obj) o;
         return Objects.equals(slots, obj.slots) &&
-                Objects.equals(parameters, obj.parameters) &&
+                Objects.equals(arguments, obj.arguments) &&
                 Objects.equals(code, obj.code) &&
                 Objects.equals(parents, obj.parents);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(slots, parameters, code, parents);
+        return Objects.hash(slots, arguments, code, parents);
     }
 
     @Override
     public String toString() {
         return "Obj{" +
-                "slots=" + slots +
-                ", parameters=" + parameters +
+                "parents=" + parents +
+                ", slots=" + slots +
+                ", arguments=" + arguments +
                 ", code=" + code +
-                ", parents=" + parents +
                 '}';
     }
 }

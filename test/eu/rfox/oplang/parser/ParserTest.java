@@ -184,4 +184,58 @@ public class ParserTest {
 
         assertEquals(ast.get(0), o);
     }
+
+    @Test
+    public void parseObjectSlot() throws TokenizerException, ParserException {
+        Parser p = new Parser("(| asd |)");
+        ArrayList<ASTItem> ast = p.parse();
+
+        Obj o = new Obj();
+        o.addSlot("asd", new Nil());
+
+        assertEquals(ast.get(0), o);
+    }
+
+    @Test
+    public void parseObjectSlotAssign() throws TokenizerException, ParserException {
+        Parser p = new Parser("(| asd = 1 |)");
+        ArrayList<ASTItem> ast = p.parse();
+
+        Obj o = new Obj();
+        o.addSlot("asd", new NumberInt(1));
+
+        assertEquals(ast.get(0), o);
+    }
+
+    @Test
+    public void parseObjectSlotMultiple() throws TokenizerException, ParserException {
+        Parser p = new Parser("(| xxx. asd = 1. |)");
+        ArrayList<ASTItem> ast = p.parse();
+
+        Obj o = new Obj();
+        o.addSlot("xxx", new Nil());
+        o.addSlot("asd", new NumberInt(1));
+
+        assertEquals(ast.get(0), o);
+    }
+
+    @Test
+    public void parseObjectSlotMultipleWithKw() throws TokenizerException, ParserException {
+        Parser p = new Parser("(| xxx. asd = 1. keyword: a = (). |)");
+        ArrayList<ASTItem> ast = p.parse();
+
+        Obj o = new Obj();
+        o.addSlot("xxx", new Nil());
+        o.addSlot("asd", new NumberInt(1));
+
+        Obj obj_with_one_argument_a = new Obj();
+        obj_with_one_argument_a.addArgument("a");
+        o.addSlot("keyword:", obj_with_one_argument_a);
+
+        assertEquals(ast.get(0), o);
+    }
 }
+
+
+
+// TODO: keyword: = 1 // keyword: 1 ve slotu chyba

@@ -10,6 +10,19 @@ import eu.rfox.oplang.parser.ast.ASTItem;
 
 import java.util.ArrayList;
 
+class SlotnameAndArguments {
+    public String slot_name = "";
+    public ArrayList<String> arguments;
+
+    SlotnameAndArguments() {
+        arguments = new ArrayList<>();
+    }
+
+    public void addArgument(String argument) {
+        arguments.add(argument);
+    }
+}
+
 public class Parser {
     private String source_code;
     private ArrayList<ASTItem> ast = new ArrayList<>();
@@ -229,6 +242,25 @@ public class Parser {
             Obj obj = parseCode(new Obj());
             advance();
             return obj;
+        } else if (check_current(TokenType.SEPARATOR)) {
+            advance();
+            Obj obj = parseSlotDefinition(new Obj());
+
+            if (check_current(TokenType.OBJ_END)) {
+                advance();
+                return obj;
+            } else if (check_current(TokenType.SEPARATOR)) {
+                advance();
+            }
+
+            if (check_current(TokenType.OBJ_END)) {
+                advance();
+                return obj;
+            }
+
+            parseCode(obj);
+            advance();
+            return obj;
         }
 
         advance();
@@ -248,6 +280,101 @@ public class Parser {
         }
 
         return obj;
+    }
+
+    private Obj parseSlotDefinition(Obj obj) {
+        while (check_current(TokenType.IDENTIFIER, TokenType.ARGUMENT, TokenType.FIRST_KW, TokenType.OPERATOR,
+                             TokenType.ASSIGNMENT)) {
+            consumeOneSlotArgument(obj);
+
+            if (check_current(TokenType.END_OF_EXPR)) {
+                advance();
+            }
+
+            if (check_current(TokenType.SEPARATOR, TokenType.OBJ_END)) {
+                return obj;
+            }
+        }
+
+        return obj;
+    }
+
+    private void consumeOneSlotArgument(Obj obj) {
+        String slot_name;
+        String argument_name;
+
+        if (check_current(TokenType.ARGUMENT)) {
+            obj.addArgument(current().content);
+            advance();
+            return;
+        } else if (check_current(TokenType.IDENTIFIER) && check_next(TokenType.ASSIGNMENT)) {
+            argument_name = current().content;
+            advance();
+            advance();
+            obj.addSlot(argument_name, parseObject());
+            return;
+        } else if (check_current(TokenType.IDENTIFIER) && check_next(TokenType.RW_ASSIGNMENT)) {
+            argument_name = current().content;
+            advance();
+            advance();
+            obj.addSlot(argument_name, parseObject());
+            obj.addRWSlot(argument_name);
+            return;
+        } else if (check_current(TokenType.FIRST_KW)) {
+            SlotnameAndArguments slot_args = consumeKeywordArguments(obj);
+            advance();  // take assignment token
+
+            ASTItem code_obj = parseObject();
+            if (! (code_obj instanceof Obj)) {
+                // TODO: can't assign arguments to non-code obj
+                return;
+            }
+
+            ((Obj) code_obj).addArguments(slot_args.arguments);
+            obj.addSlot(slot_args.slot_name, code_obj);
+            return;
+        } else if (check_current(TokenType.OPERATOR, TokenType.ASSIGNMENT)) {
+            slot_name = current().content;
+            advance();
+
+            if (!check_current(TokenType.IDENTIFIER)) {
+                // TODO: error handling - but maybe not, because arguments can be in obj
+            }
+
+            obj.addArgument(current().content);
+            advance();
+
+            advance();  // take assignment token
+            obj.addSlot(slot_name, parseObject());
+            return;
+        } else if (check_current(TokenType.IDENTIFIER)) {
+            obj.addSlot(current().content);
+            advance();
+            return;
+        }
+
+        // TODO: error handling
+    }
+
+    private SlotnameAndArguments consumeKeywordArguments(Obj obj) {
+        SlotnameAndArguments slot_args = new SlotnameAndArguments();
+
+        while (check_current(TokenType.KEYWORD, TokenType.FIRST_KW)) {
+            if (!check_next(TokenType.IDENTIFIER)) {
+                // TODO: error handling
+            }
+
+            slot_args.slot_name += current().content;
+            advance();
+            slot_args.addArgument(current().content);
+            advance();
+        }
+
+        if (slot_args.slot_name.equals("")) {
+            // TODO: error handling
+        }
+
+        return slot_args;
     }
 
     private boolean match_any(TokenType... types) {

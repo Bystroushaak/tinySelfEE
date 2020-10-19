@@ -9,4 +9,19 @@ public class Nil implements ASTItem {
     public <R> R accept(Visitor<R> visitor) {
         return visitor.visitNil(this);
     }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (getClass() == o.getClass()) {
+            return true;
+        }
+
+        return false;
+    }
+
+    @Override
+    public String toString() {
+        return "Nil{}";
+    }
 }
