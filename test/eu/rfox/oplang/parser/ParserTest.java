@@ -358,6 +358,18 @@ public class ParserTest {
         assertEquals(token_info.has_slots, false);
         assertEquals(token_info.has_code, false);
     }
+
+    @Test
+    public void parseObjectWithParent() throws TokenizerException, ParserException {
+        Parser p = new Parser("(| parent* = 1. slot = nil. |)");
+        ArrayList<ASTItem> ast = p.parse();
+
+        Obj o = new Obj();
+        o.addSlot("slot", new Nil());
+        o.addParent("parent*", new NumberInt(1));
+
+        assertEquals(ast.get(0), o);
+    }
 }
 
 

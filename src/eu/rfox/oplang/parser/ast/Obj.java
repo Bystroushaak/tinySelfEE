@@ -8,7 +8,7 @@ public class Obj implements ASTItem {
     HashMap<String, ASTItem> slots;
     ArrayList<String> arguments;
     ArrayList<ASTItem> code;
-    HashMap<String, Obj> parents;
+    HashMap<String, ASTItem> parents;
 
     public Obj() {
     }
@@ -43,11 +43,24 @@ public class Obj implements ASTItem {
     }
 
     public void addSlot(String name, ASTItem value) {
+        if (name.charAt(name.length() - 1) == '*') {
+            addParent(name, value);
+            return;
+        }
+
         if (slots == null) {
             slots = new HashMap<>();
         }
 
         slots.put(name, value);
+    }
+
+    public void addParent(String name, ASTItem value) {
+        if (parents == null) {
+            parents = new HashMap<>();
+        }
+
+        parents.put(name, value);
     }
 
     public void addRWSlot(String name) {
