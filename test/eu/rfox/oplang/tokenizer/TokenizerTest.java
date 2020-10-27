@@ -134,6 +134,11 @@ public class TokenizerTest {
     }
 
     @Test
+    public void consumeMultikeyword() throws TokenizerException {
+        checkOneIdentifier("some:Something:", TokenType.FIRST_KW, "some:Something:");
+    }
+
+    @Test
     public void consumeKeywords() throws TokenizerException {
         checkOneIdentifier(" Something: ", TokenType.KEYWORD, "Something:");
     }

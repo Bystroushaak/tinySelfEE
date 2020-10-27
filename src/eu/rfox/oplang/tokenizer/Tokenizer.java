@@ -270,8 +270,12 @@ public class Tokenizer {
         return (peek() == '.' && isAlphaNumUnderscore(peekTwo()));
     }
 
+    private boolean isMultiKeywordMsg() {
+        return (peek() == ':' && isAlphaNumUnderscore(peekTwo()));
+    }
+
     private void consumeKeywordOrIdentifier(boolean first_kw){
-        while (isAlphaNumUnderscore(peek()) || isResendToken()) {
+        while (isAlphaNumUnderscore(peek()) || isResendToken() || isMultiKeywordMsg()) {
             advance();
         }
 
