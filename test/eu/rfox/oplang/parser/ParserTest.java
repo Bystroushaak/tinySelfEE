@@ -313,10 +313,10 @@ public class ParserTest {
     }
 
     ObjTokensInfo scanCode(String source) throws ParserException, TokenizerException {
-        Parser p = new Parser(source);
-        p.tokens = new Tokenizer(source).tokenize();
+        ObjTokensInfo obj_info = new ObjTokensInfo(new Tokenizer(source).tokenize(), 0);
+        obj_info.scan(TokenType.BLOCK_END);
 
-        return p.scanObjTokens(TokenType.BLOCK_END);
+        return obj_info;
     }
 
     @Test

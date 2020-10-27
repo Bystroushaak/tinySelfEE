@@ -4,6 +4,7 @@ import eu.rfox.oplang.parser.ast.*;
 import eu.rfox.oplang.tokenizer.Token;
 import eu.rfox.oplang.tokenizer.TokenType;
 import eu.rfox.oplang.tokenizer.Tokenizer;
+import eu.rfox.oplang.parser.ObjTokensInfo;
 import eu.rfox.oplang.tokenizer.TokenizerException;
 
 import eu.rfox.oplang.parser.ast.ASTItem;
@@ -20,25 +21,6 @@ class SlotnameAndArguments {
 
     public void addArgument(String argument) {
         arguments.add(argument);
-    }
-}
-
-
-class ObjTokensInfo {
-    boolean has_slots;
-    boolean has_code;
-
-    int obj_start = -1;
-    int obj_end = -1;
-    int first_separator_index = -1;
-    int second_separator_index = -1;
-
-    public boolean hasNoSeparator() {
-        return (first_separator_index == -1 && second_separator_index == -1);
-    }
-
-    public boolean hasBothSeparators() {
-        return (first_separator_index >= 0 && second_separator_index >= 0);
     }
 }
 
@@ -283,9 +265,9 @@ public class Parser {
             advance();
             return new_obj;
         } else {
-            ObjTokensInfo obj_info;
+            ObjTokensInfo obj_info = new ObjTokensInfo(tokens, current_token_index);
             try {
-                obj_info = scanObjTokens(obj_end);
+                obj_info.scan(obj_end);
             } catch (ParserException e) {
                 // handle parsing recovery
                 advance();
@@ -317,93 +299,6 @@ public class Parser {
 
             advance();
             return new_obj;
-        }
-    }
-
-    ObjTokensInfo scanObjTokens(TokenType end_token) throws ParserException {
-        ObjTokensInfo obj_info = scanTokens(end_token);
-
-        if (obj_info.hasNoSeparator()) {
-            return new ObjTokensInfo();
-        }
-
-        scanForSlots(obj_info);
-        scanForCode(obj_info);
-
-        return obj_info;
-    }
-
-    private ObjTokensInfo scanTokens(TokenType end_token) throws ParserException {
-        int current_index = current_token_index;
-
-        ObjTokensInfo obj_info = new ObjTokensInfo();
-        obj_info.obj_start = current_index;
-
-        int stack_count = 0;
-        for (int i = current_index; ; i++) {
-            Token t = tokens.get(i);
-
-            if (t.type == TokenType.EOF) {
-                throw new ParserException("Object's end not found.");
-            }
-
-            if (stack_count == 0) {
-                if (t.type == end_token) {
-                    obj_info.obj_end = i;
-                    break;
-                } else if (t.type == TokenType.SEPARATOR) {
-                    if (obj_info.first_separator_index == -1) {
-                        obj_info.first_separator_index = i;
-                    } else if (obj_info.second_separator_index == -1) {
-                        obj_info.second_separator_index = i;
-                    } else {
-                        throw new ParserException("Too many separators!"); // consume to the end
-                    }
-                }
-            }
-
-            // ignore nested objects
-            if (t.type == TokenType.OBJ_START || t.type == TokenType.BLOCK_START) {
-                stack_count++;
-            } else if (t.type == TokenType.OBJ_END || t.type == TokenType.BLOCK_END) {
-                stack_count--;
-            }
-        }
-
-        return obj_info;
-    }
-
-    private void scanForSlots(ObjTokensInfo obj_info) {
-        int start = obj_info.obj_start;
-        int end = obj_info.first_separator_index;
-        if (obj_info.hasBothSeparators()) {
-            start = obj_info.first_separator_index;
-            end = obj_info.second_separator_index;
-        }
-
-        for (int i = start; i < end; i++) {
-            Token t = tokens.get(i);
-
-            if (t.type != TokenType.OBJ_START && t.type != TokenType.SEPARATOR) {
-                obj_info.has_slots = true;
-                break;
-            }
-        }
-    }
-
-    private void scanForCode(ObjTokensInfo obj_info) {
-        int start = obj_info.first_separator_index;
-        if (obj_info.hasBothSeparators()) {
-            start = obj_info.second_separator_index;
-        }
-
-        for (int i = start; i < obj_info.obj_end; i++) {
-            Token t = tokens.get(i);
-
-            if (t.type != TokenType.SEPARATOR && t.type != TokenType.OBJ_END) {
-                obj_info.has_code = true;
-                break;
-            }
         }
     }
 
