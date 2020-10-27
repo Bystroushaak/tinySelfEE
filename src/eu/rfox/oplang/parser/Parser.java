@@ -111,6 +111,12 @@ public class Parser {
 //            case NUMBER_HEX:
 //                return parseHexNumber();
         }
+
+        if (current().type == TokenType.IDENTIFIER && current().content.equals("nil")) {
+            advance();
+            return new Nil();
+        }
+
         return null;
     }
 
@@ -311,8 +317,6 @@ public class Parser {
 
             advance();
             return new_obj;
-
-
         }
     }
 
@@ -442,20 +446,20 @@ public class Parser {
             argument_name = current().content;
             advance();
             advance();
-            obj.addSlot(argument_name, parseObjectOrBlock());
+            obj.addSlot(argument_name, parseExpression());
             return;
         } else if (check_current(TokenType.IDENTIFIER) && check_next(TokenType.RW_ASSIGNMENT)) {
             argument_name = current().content;
             advance();
             advance();
-            obj.addSlot(argument_name, parseObjectOrBlock());
+            obj.addSlot(argument_name, parseExpression());
             obj.addRWSlot(argument_name);
             return;
         } else if (check_current(TokenType.FIRST_KW)) {
             SlotnameAndArguments slot_args = consumeKeywordArguments(obj);
             advance();  // take assignment token
 
-            ASTItem code_obj = parseObjectOrBlock();
+            ASTItem code_obj = parseExpression();
             if (!(code_obj instanceof Obj)) {
                 // TODO: can't assign arguments to non-code obj
                 return;
@@ -477,7 +481,7 @@ public class Parser {
 
             advance();  // take assignment token
 
-            ASTItem code_obj = parseObjectOrBlock();
+            ASTItem code_obj = parseExpression();
             if (!(code_obj instanceof Obj)) {
                 // TODO: can't assign arguments to non-code obj
                 return;
