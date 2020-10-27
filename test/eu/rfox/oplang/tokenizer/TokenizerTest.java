@@ -76,11 +76,11 @@ public class TokenizerTest {
         assertEquals(number.type, TokenType.NUMBER);
         assertEquals(number.content, "1");
 
-        Token comment = tokens.get(1);
-        assertEquals(comment.type, TokenType.COMMENT);
-        assertEquals(comment.content, "# comment");
+//        Token comment = tokens.get(1);
+//        assertEquals(comment.type, TokenType.COMMENT);
+//        assertEquals(comment.content, "# comment");
 
-        assertEquals(tokens.get(2).type, TokenType.EOF);
+        assertEquals(tokens.get(1).type, TokenType.EOF);
     }
 
     @Test
@@ -92,11 +92,11 @@ public class TokenizerTest {
         assertEquals(number.type, TokenType.NUMBER);
         assertEquals(number.content, "1");
 
-        Token comment = tokens.get(1);
-        assertEquals(comment.type, TokenType.COMMENT);
-        assertEquals(comment.content, "# comment");
+//        Token comment = tokens.get(1);
+//        assertEquals(comment.type, TokenType.COMMENT);
+//        assertEquals(comment.content, "# comment");
 
-        assertEquals(tokens.get(2).type, TokenType.EOF);
+        assertEquals(tokens.get(1).type, TokenType.EOF);
     }
 
     @Test

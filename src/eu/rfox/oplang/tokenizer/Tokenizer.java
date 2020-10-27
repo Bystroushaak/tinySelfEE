@@ -210,7 +210,7 @@ public class Tokenizer {
             advance();
         }
 
-        addToken(TokenType.COMMENT);
+//        addToken(TokenType.COMMENT);
     }
 
     private boolean isLowAlpha(char c) {
