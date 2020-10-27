@@ -222,7 +222,7 @@ public class Tokenizer {
     }
 
     private boolean isAlphaNumUnderscore(char c) {
-        return isLowAlpha(c) || isBigAlpha(c) || isDigit(c) || c == '_';
+        return isLowAlpha(c) || isBigAlpha(c) || isDigit(c) || c == '_' || c == '*';
     }
 
     private void consumeArgument() {
@@ -266,8 +266,12 @@ public class Tokenizer {
         addToken(TokenType.OPERATOR);
     }
 
+    private boolean isResendToken() {
+        return (peek() == '.' && isAlphaNumUnderscore(peekTwo()));
+    }
+
     private void consumeKeywordOrIdentifier(boolean first_kw){
-        while (isAlphaNumUnderscore(peek())) {
+        while (isAlphaNumUnderscore(peek()) || isResendToken()) {
             advance();
         }
 

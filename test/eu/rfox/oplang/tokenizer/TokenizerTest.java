@@ -177,16 +177,39 @@ public class TokenizerTest {
         assertEquals(tokens.get(1).type, TokenType.EOF);
     }
 
-    @Test
-    public void consumeIdentifier() throws TokenizerException {
-        Tokenizer t = new Tokenizer(" Someth1n_g");
+    Token getIdentifier(String source) throws  TokenizerException {
+        Tokenizer t = new Tokenizer(source);
         ArrayList<Token> tokens = t.tokenize();
 
         Token identifier = tokens.get(0);
-        assertEquals(identifier.type, TokenType.IDENTIFIER);
-        assertEquals(identifier.content, "Someth1n_g");
 
         assertEquals(tokens.get(1).type, TokenType.EOF);
+
+        return identifier;
+    }
+
+    @Test
+    public void consumeIdentifier() throws TokenizerException {
+        Token identifier = getIdentifier(" Someth1n_g");
+
+        assertEquals(identifier.type, TokenType.IDENTIFIER);
+        assertEquals(identifier.content, "Someth1n_g");
+    }
+
+    @Test
+    public void consumeIdentifierWithStar() throws TokenizerException {
+        Token identifier = getIdentifier("parent*");
+
+        assertEquals(identifier.type, TokenType.IDENTIFIER);
+        assertEquals(identifier.content, "parent*");
+    }
+
+    @Test
+    public void consumeIdentifierWithDot() throws TokenizerException {
+        Token identifier = getIdentifier("parent.something");
+
+        assertEquals(identifier.type, TokenType.IDENTIFIER);
+        assertEquals(identifier.content, "parent.something");
     }
 
     @Test
