@@ -23,25 +23,47 @@ class SlotnameAndArguments {
     }
 }
 
+
+class ObjTokensInfo {
+    boolean has_slots;
+    boolean has_code;
+
+    int obj_start = -1;
+    int obj_end = -1;
+    int first_separator_index = -1;
+    int second_separator_index = -1;
+
+    public boolean hasNoSeparator() {
+        return (first_separator_index == -1 && second_separator_index == -1);
+    }
+
+    public boolean hasBothSeparators() {
+        return (first_separator_index >= 0 && second_separator_index >= 0);
+    }
+}
+
+
 public class Parser {
     private String source_code;
-    private ArrayList<ASTItem> ast = new ArrayList<>();
-    private ArrayList<ParserException> exceptions = new ArrayList<ParserException>();
-    public boolean hadError = false;
+    ArrayList<ASTItem> ast = new ArrayList<>();
+    private ArrayList<ParserException> errors = new ArrayList<ParserException>();
+    public boolean hadErrors = false;
 
-    private ArrayList<Token> tokens;
-    private int current_token_index = 0;
+    ArrayList<Token> tokens;
+    int current_token_index = 0;
 
     public Parser(String source_code) {
         this.source_code = source_code;
     }
 
+    private void logError(String message, Token start, Token end) {
+        hadErrors = true;
+        errors.add(new ParserException(message, start, end));
+    }
+
     public ArrayList<ASTItem> parse() throws TokenizerException, ParserException {
         Tokenizer tokenizer = new Tokenizer(source_code);
         tokens = tokenizer.tokenize();
-//        for (Token token : tokens) {
-//            System.out.println(token.toString());
-//        }
 
         while (!isAtEnd()) {
             ast.add(parseObjectOrBlock());
@@ -67,7 +89,8 @@ public class Parser {
         }
 
         advance();
-        return parseObjectOrBlock();
+//        return parseObjectOrBlock();
+        return null;
     }
 
     private ASTItem parseLiterals() {
@@ -253,29 +276,131 @@ public class Parser {
             parseCode(new_obj, obj_end);
             advance();
             return new_obj;
-        } else if (check_current(TokenType.SEPARATOR)) {
-            advance();
-            parseSlotDefinition(new_obj, obj_end);
-
-            if (check_current(obj_end)) {
+        } else {
+            ObjTokensInfo obj_info;
+            try {
+                obj_info = scanObjTokens(obj_end);
+            } catch (ParserException e) {
+                // handle parsing recovery
                 advance();
-                return new_obj;
-            } else if (check_current(TokenType.SEPARATOR)) {
-                advance();
+                return null;
             }
 
-            if (check_current(obj_end)) {
-                advance();
-                return new_obj;
+            if (obj_info.has_slots) {
+                // consume stuff until first separator and then also that
+                if (obj_info.hasBothSeparators()) {
+                    while (! check_current(TokenType.SEPARATOR)) {
+                        advance();
+                    }
+                    advance();
+                }
+
+                parseSlotDefinition(new_obj, obj_end);
+
+                if (check_current(obj_end)) {
+                    advance();
+                    return new_obj;
+                } else if (check_current(TokenType.SEPARATOR)) {
+                    advance();
+                }
             }
 
-            parseCode(new_obj, obj_end);
+            if (obj_info.has_code) {
+                parseCode(new_obj, obj_end);
+            }
+
             advance();
             return new_obj;
+
+
+        }
+    }
+
+    ObjTokensInfo scanObjTokens(TokenType end_token) throws ParserException {
+        ObjTokensInfo obj_info = scanTokens(end_token);
+
+        if (obj_info.hasNoSeparator()) {
+            return new ObjTokensInfo();
         }
 
-        advance();
-        return null;
+        scanForSlots(obj_info);
+        scanForCode(obj_info);
+
+        return obj_info;
+    }
+
+    private ObjTokensInfo scanTokens(TokenType end_token) throws ParserException {
+        int current_index = current_token_index;
+
+        ObjTokensInfo obj_info = new ObjTokensInfo();
+        obj_info.obj_start = current_index;
+
+        int stack_count = 0;
+        for (int i = current_index; ; i++) {
+            Token t = tokens.get(i);
+
+            if (t.type == TokenType.EOF) {
+                throw new ParserException("Object's end not found.");
+            }
+
+            if (stack_count == 0) {
+                if (t.type == end_token) {
+                    obj_info.obj_end = i;
+                    break;
+                } else if (t.type == TokenType.SEPARATOR) {
+                    if (obj_info.first_separator_index == -1) {
+                        obj_info.first_separator_index = i;
+                    } else if (obj_info.second_separator_index == -1) {
+                        obj_info.second_separator_index = i;
+                    } else {
+                        throw new ParserException("Too many separators!"); // consume to the end
+                    }
+                }
+            }
+
+            // ignore nested objects
+            if (t.type == TokenType.OBJ_START || t.type == TokenType.BLOCK_START) {
+                stack_count++;
+            } else if (t.type == TokenType.OBJ_END || t.type == TokenType.BLOCK_END) {
+                stack_count--;
+            }
+        }
+
+        return obj_info;
+    }
+
+    private void scanForSlots(ObjTokensInfo obj_info) {
+        int start = obj_info.obj_start;
+        int end = obj_info.first_separator_index;
+        if (obj_info.hasBothSeparators()) {
+            start = obj_info.first_separator_index;
+            end = obj_info.second_separator_index;
+        }
+
+        for (int i = start; i < end; i++) {
+            Token t = tokens.get(i);
+
+            if (t.type != TokenType.OBJ_START && t.type != TokenType.SEPARATOR) {
+                obj_info.has_slots = true;
+                break;
+            }
+        }
+    }
+
+    private void scanForCode(ObjTokensInfo obj_info) {
+        int start = obj_info.first_separator_index;
+        if (obj_info.hasBothSeparators()) {
+            start = obj_info.second_separator_index;
+        }
+
+        for (int i = start; i < obj_info.obj_end; i++) {
+            Token t = tokens.get(i);
+
+            if (t.type != TokenType.SEPARATOR && t.type != TokenType.OBJ_END) {
+                obj_info.has_code = true;
+                break;
+            }
+        }
     }
 
     private void parseCode(Obj obj, TokenType obj_end) {

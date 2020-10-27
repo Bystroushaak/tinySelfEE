@@ -1,6 +1,9 @@
 package eu.rfox.oplang.parser;
 
 import eu.rfox.oplang.parser.ast.*;
+import eu.rfox.oplang.tokenizer.Token;
+import eu.rfox.oplang.tokenizer.TokenType;
+import eu.rfox.oplang.tokenizer.Tokenizer;
 import eu.rfox.oplang.tokenizer.TokenizerException;
 import org.junit.Test;
 
@@ -197,6 +200,17 @@ public class ParserTest {
     }
 
     @Test
+    public void parseObjectWithSlotsAndOneSeparator() throws TokenizerException, ParserException {
+        Parser p = new Parser("( asd |)");
+        ArrayList<ASTItem> ast = p.parse();
+
+        Obj o = new Obj();
+        o.addSlot("asd", new Nil());
+
+        assertEquals(ast.get(0), o);
+    }
+
+    @Test
     public void parseObjectWithSlotAssign() throws TokenizerException, ParserException {
         Parser p = new Parser("(| asd = 1 |)");
         ArrayList<ASTItem> ast = p.parse();
@@ -297,8 +311,54 @@ public class ParserTest {
 
         assertEquals(ast.get(0), b);
     }
-}
 
+    ObjTokensInfo scanCode(String source) throws ParserException, TokenizerException {
+        Parser p = new Parser(source);
+        p.tokens = new Tokenizer(source).tokenize();
+
+        return p.scanObjTokens(TokenType.BLOCK_END);
+    }
+
+    @Test
+    public void scanObjTokensWithSlotsAndCode() throws TokenizerException, ParserException {
+        ObjTokensInfo token_info = scanCode("xxx. asd = 1. | self xx. asd. ^ 1.]");
+
+        assertEquals(token_info.has_slots, true);
+        assertEquals(token_info.has_code, true);
+    }
+
+    @Test
+    public void scanObjTokensWithSlots() throws TokenizerException, ParserException {
+        ObjTokensInfo token_info = scanCode("xxx. asd = 1. |]");
+
+        assertEquals(token_info.has_slots, true);
+        assertEquals(token_info.has_code, false);
+    }
+
+    @Test
+    public void scanObjTokensWithCode() throws TokenizerException, ParserException {
+        ObjTokensInfo token_info = scanCode("| self xx. asd. ^ 1.]");
+
+        assertEquals(token_info.has_slots, false);
+        assertEquals(token_info.has_code, true);
+    }
+
+    @Test
+    public void scanObjTokensOneSlot() throws TokenizerException, ParserException {
+        ObjTokensInfo token_info = scanCode(" asd |]");
+
+        assertEquals(token_info.has_slots, true);
+        assertEquals(token_info.has_code, false);
+    }
+
+    @Test
+    public void scanObjTokensEmptyObj() throws TokenizerException, ParserException {
+        ObjTokensInfo token_info = scanCode("|]");
+
+        assertEquals(token_info.has_slots, false);
+        assertEquals(token_info.has_code, false);
+    }
+}
 
 
 // TODO: keyword: = 1 // keyword: 1 ve slotu chyba
