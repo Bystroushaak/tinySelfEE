@@ -7,64 +7,46 @@ import java.util.ArrayList;
 import static org.junit.Assert.*;
 
 public class TokenizerTest {
-    @Test
-    public void consumeDoubleQuoteString() throws TokenizerException {
-        Tokenizer t = new Tokenizer("\"some string\"");
+    Token getOneIdentifierWithEOFCheck(String source) throws TokenizerException {
+        Tokenizer t = new Tokenizer(source);
         ArrayList<Token> tokens = t.tokenize();
 
-        Token str = tokens.get(0);
-        assertEquals(str.type, TokenType.DOUBLE_Q_STRING);
-        assertEquals(str.content, "some string");
+        Token identifier = tokens.get(0);
 
         assertEquals(tokens.get(1).type, TokenType.EOF);
+
+        return identifier;
+    }
+
+    void checkOneIdentifier(String source, TokenType expected_type, String content) throws TokenizerException {
+        Token t = getOneIdentifierWithEOFCheck(source);
+        assertEquals(t.type, expected_type);
+        assertEquals(t.content, content);
+    }
+
+    @Test
+    public void consumeDoubleQuoteString() throws TokenizerException {
+        checkOneIdentifier("\"some string\"", TokenType.DOUBLE_Q_STRING, "some string");
     }
 
     @Test
     public void consumeSingleQuoteString() throws TokenizerException {
-        Tokenizer t = new Tokenizer("'some string'");
-        ArrayList<Token> tokens = t.tokenize();
-
-        Token str = tokens.get(0);
-        assertEquals(str.type, TokenType.SINGLE_Q_STRING);
-        assertEquals(str.content, "some string");
-
-        assertEquals(tokens.get(1).type, TokenType.EOF);
+        checkOneIdentifier("'some string'", TokenType.SINGLE_Q_STRING, "some string");
     }
 
     @Test
     public void consumeHexNumber() throws TokenizerException {
-        Tokenizer t = new Tokenizer("0x01");
-        ArrayList<Token> tokens = t.tokenize();
-
-        Token hex_number = tokens.get(0);
-        assertEquals(hex_number.type, TokenType.NUMBER_HEX);
-        assertEquals(hex_number.content, "0x01");
-
-        assertEquals(tokens.get(1).type, TokenType.EOF);
+        checkOneIdentifier("0x01", TokenType.NUMBER_HEX, "0x01");
     }
 
     @Test
     public void consumeNumber() throws TokenizerException {
-        Tokenizer t = new Tokenizer("123");
-        ArrayList<Token> tokens = t.tokenize();
-
-        Token hex_number = tokens.get(0);
-        assertEquals(hex_number.type, TokenType.NUMBER);
-        assertEquals(hex_number.content, "123");
-
-        assertEquals(tokens.get(1).type, TokenType.EOF);
+        checkOneIdentifier("123", TokenType.NUMBER, "123");
     }
 
     @Test
     public void consumeFloatNumber() throws TokenizerException {
-        Tokenizer t = new Tokenizer("123.3");
-        ArrayList<Token> tokens = t.tokenize();
-
-        Token hex_number = tokens.get(0);
-        assertEquals(hex_number.type, TokenType.NUMBER_FLOAT);
-        assertEquals(hex_number.content, "123.3");
-
-        assertEquals(tokens.get(1).type, TokenType.EOF);
+        checkOneIdentifier("123.3", TokenType.NUMBER_FLOAT, "123.3");
     }
 
     @Test
@@ -119,14 +101,7 @@ public class TokenizerTest {
 
     @Test
     public void consumeArgument() throws TokenizerException {
-        Tokenizer t = new Tokenizer(" :something ");
-        ArrayList<Token> tokens = t.tokenize();
-
-        Token argument = tokens.get(0);
-        assertEquals(argument.type, TokenType.ARGUMENT);
-        assertEquals(argument.content, "something");
-
-        assertEquals(tokens.get(1).type, TokenType.EOF);
+        checkOneIdentifier(" :something ", TokenType.ARGUMENT, "something");
     }
 
     @Test
@@ -155,61 +130,27 @@ public class TokenizerTest {
 
     @Test
     public void consumeFirstKeyword() throws TokenizerException {
-        Tokenizer t = new Tokenizer(" something: ");
-        ArrayList<Token> tokens = t.tokenize();
-
-        Token keyword = tokens.get(0);
-        assertEquals(keyword.type, TokenType.FIRST_KW);
-        assertEquals(keyword.content, "something:");
-
-        assertEquals(tokens.get(1).type, TokenType.EOF);
+        checkOneIdentifier(" something: ", TokenType.FIRST_KW, "something:");
     }
 
     @Test
     public void consumeKeywords() throws TokenizerException {
-        Tokenizer t = new Tokenizer(" Something: ");
-        ArrayList<Token> tokens = t.tokenize();
-
-        Token keyword = tokens.get(0);
-        assertEquals(keyword.type, TokenType.KEYWORD);
-        assertEquals(keyword.content, "Something:");
-
-        assertEquals(tokens.get(1).type, TokenType.EOF);
-    }
-
-    Token getIdentifier(String source) throws  TokenizerException {
-        Tokenizer t = new Tokenizer(source);
-        ArrayList<Token> tokens = t.tokenize();
-
-        Token identifier = tokens.get(0);
-
-        assertEquals(tokens.get(1).type, TokenType.EOF);
-
-        return identifier;
+        checkOneIdentifier(" Something: ", TokenType.KEYWORD, "Something:");
     }
 
     @Test
     public void consumeIdentifier() throws TokenizerException {
-        Token identifier = getIdentifier(" Someth1n_g");
-
-        assertEquals(identifier.type, TokenType.IDENTIFIER);
-        assertEquals(identifier.content, "Someth1n_g");
+        checkOneIdentifier(" Someth1n_g", TokenType.IDENTIFIER, "Someth1n_g");
     }
 
     @Test
     public void consumeIdentifierWithStar() throws TokenizerException {
-        Token identifier = getIdentifier("parent*");
-
-        assertEquals(identifier.type, TokenType.IDENTIFIER);
-        assertEquals(identifier.content, "parent*");
+        checkOneIdentifier("parent*", TokenType.IDENTIFIER, "parent*");
     }
 
     @Test
     public void consumeIdentifierWithDot() throws TokenizerException {
-        Token identifier = getIdentifier("parent.something");
-
-        assertEquals(identifier.type, TokenType.IDENTIFIER);
-        assertEquals(identifier.content, "parent.something");
+        checkOneIdentifier("parent.something", TokenType.IDENTIFIER, "parent.something");
     }
 
     @Test
