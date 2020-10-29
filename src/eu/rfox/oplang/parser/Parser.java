@@ -4,7 +4,6 @@ import eu.rfox.oplang.parser.ast.*;
 import eu.rfox.oplang.tokenizer.Token;
 import eu.rfox.oplang.tokenizer.TokenType;
 import eu.rfox.oplang.tokenizer.Tokenizer;
-import eu.rfox.oplang.parser.ObjTokensInfo;
 import eu.rfox.oplang.tokenizer.TokenizerException;
 
 import eu.rfox.oplang.parser.ast.ASTItem;
@@ -28,7 +27,7 @@ class SlotnameAndArguments {
 public class Parser {
     private String source_code;
     ArrayList<ASTItem> ast = new ArrayList<>();
-    private ArrayList<ParserException> errors = new ArrayList<ParserException>();
+    private ArrayList<ParserException> errors = new ArrayList<>();
     public boolean hadErrors = false;
 
     ArrayList<Token> tokens;
@@ -38,17 +37,28 @@ public class Parser {
         this.source_code = source_code;
     }
 
-    private void logError(String message, Token start, Token end) {
+    private void logError(ParserException exc) {
         hadErrors = true;
-        errors.add(new ParserException(message, start, end));
+        errors.add(exc);
     }
 
-    public ArrayList<ASTItem> parse() throws TokenizerException, ParserException {
+    private void logError(String message, Token start, Token end) {
+        logError(new ParserException(message, start, end));
+    }
+
+    private void logError(String message, Token start) {
+        logError(message, start, null);
+    }
+
+    public ArrayList<ASTItem> parse() throws TokenizerException {
         Tokenizer tokenizer = new Tokenizer(source_code);
         tokens = tokenizer.tokenize();
 
         while (!isAtEnd()) {
-            ast.add(parseObjectOrBlock());
+            ASTItem item = parseObjectOrBlock();
+            if (item != null) {
+                ast.add(item);
+            }
         }
 
         return ast;
@@ -70,8 +80,8 @@ public class Parser {
             return parseObjectOrBlock();
         }
 
+        logError("Unrecognized token.", current());
         advance();
-//        return parseObjectOrBlock();
         return null;
     }
 
@@ -192,7 +202,7 @@ public class Parser {
 
     private ASTItem parseBinaryMessage() {
         return sendOrResend(parseExpression(), new MessageBinary(advance().content,
-                                                             parseExpression()));
+                                                                 parseExpression()));
     }
 
     private ASTItem parseKeywordMessage() {
@@ -286,10 +296,12 @@ public class Parser {
             return new_obj;
         } else {
             ObjTokensInfo obj_info = new ObjTokensInfo(tokens, current_token_index);
-            try {
-                obj_info.scan(obj_end);
-            } catch (ParserException e) {
-                // handle parsing recovery
+            obj_info.scan(obj_end);
+
+            // recovery, just log the error and skip the object
+            if (obj_info.had_exception) {
+                logError(obj_info.exception);
+                current_token_index = obj_info.obj_end;
                 advance();
                 return null;
             }
@@ -314,21 +326,26 @@ public class Parser {
             }
 
             if (obj_info.has_code) {
-                if (obj_info.first_separator_index != -1) {
-                    advance(); // consume separator if there is one, if not, it is parens for priority
+                if (! obj_info.hasNoSeparator()) {
+                    advance();
                 }
                 parseCode(new_obj, obj_end);
             }
+            advance();  // consume end of the object
 
-            advance();
 
-            if (obj_info.first_separator_index == -1) {
+            if (obj_info.hasNoSeparator()) {
+                // blocks are always objects
+                if (obj_end == TokenType.BLOCK_END) {
+                    return new_obj;
+                }
+
                 if (new_obj.isSingleExpression()) {
                     return new_obj.getFirstExpression();
-                } else if (obj_end != TokenType.BLOCK_END) {  // block can be multistatements as they are always objects
-                    logError("Invalid syntax; multiple expression in parens. Use (| code) syntax instead!",
+                } else {
+                    logError("Invalid syntax; multiple expressions in parens. Use (| code) syntax instead!",
                              tokens.get(obj_info.obj_start), tokens.get(obj_info.obj_end));
-                    return new_obj.getFirstExpression();
+                    return new_obj;
                 }
             }
 
@@ -389,12 +406,10 @@ public class Parser {
             advance();  // take assignment token
 
             ASTItem code_obj = parseExpression();
-            if (!(code_obj instanceof Obj)) {
-                // TODO: can't assign arguments to non-code obj
-                return;
+            if ((code_obj instanceof Obj)) {
+                ((Obj) code_obj).addArguments(slot_args.arguments);
             }
 
-            ((Obj) code_obj).addArguments(slot_args.arguments);
             obj.addSlot(slot_args.slot_name, code_obj);
             return;
         } else if (check_current(TokenType.OPERATOR, TokenType.ASSIGNMENT)) {
@@ -402,7 +417,7 @@ public class Parser {
             advance();
 
             if (!check_current(TokenType.IDENTIFIER)) {
-                // TODO: error handling - but maybe not, because arguments can be in obj
+                logError("Invalid argument name: " + current().content, current());
             }
 
             argument_name = current().content;
@@ -411,12 +426,10 @@ public class Parser {
             advance();  // take assignment token
 
             ASTItem code_obj = parseExpression();
-            if (!(code_obj instanceof Obj)) {
-                // TODO: can't assign arguments to non-code obj
-                return;
+            if ((code_obj instanceof Obj)) {
+                ((Obj) code_obj).addArgument(argument_name);
             }
 
-            ((Obj) code_obj).addArgument(argument_name);
             obj.addSlot(slot_name, code_obj);
             return;
         } else if (check_current(TokenType.IDENTIFIER)) {
@@ -425,15 +438,17 @@ public class Parser {
             return;
         }
 
-        // TODO: error handling
+        logError("Unknown type of slot definition: " + current().content, current());
+        advance();
     }
 
     private SlotnameAndArguments consumeKeywordArguments(Obj obj) {
         SlotnameAndArguments slot_args = new SlotnameAndArguments();
 
+        int index_of_first_slot_name = current_token_index;
         while (check_current(TokenType.KEYWORD, TokenType.FIRST_KW)) {
             if (!check_next(TokenType.IDENTIFIER)) {
-                // TODO: error handling
+                logError("Invalid name of the keyword argument: " + peek().content, peek());
             }
 
             slot_args.slot_name += current().content;
@@ -443,7 +458,7 @@ public class Parser {
         }
 
         if (slot_args.slot_name.equals("")) {
-            // TODO: error handling
+            logError("Slot name can't be empty!", tokens.get(index_of_first_slot_name));
         }
 
         return slot_args;

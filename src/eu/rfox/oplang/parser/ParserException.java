@@ -10,6 +10,10 @@ public class ParserException extends Exception {
         super(message);
     }
 
+    ParserException(String message, Token token_start) {
+        this(message, token_start, null);
+    }
+
     ParserException(String message, Token token_start, Token token_end) {
         super(message);
         this.token_start = token_start;

@@ -16,110 +16,122 @@ import static org.junit.Assert.*;
 public class ParserTest {
 
     @Test
-    public void parseIntNumber() throws TokenizerException, ParserException {
+    public void parseIntNumber() throws TokenizerException {
         Parser p = new Parser("3");
         ArrayList<ASTItem> ast = p.parse();
 
         assertEquals(ast.get(0), new NumberInt(3));
+        assertEquals(p.hadErrors, false);
     }
 
     @Test
-    public void parseFloatNumber() throws TokenizerException, ParserException {
+    public void parseFloatNumber() throws TokenizerException {
         Parser p = new Parser("3.5");
         ArrayList<ASTItem> ast = p.parse();
 
         assertEquals(ast.get(0), new NumberFloat((float) 3.5));
+        assertEquals(p.hadErrors, false);
     }
 
     @Test
-    public void parseHexNumber() throws TokenizerException, ParserException {
+    public void parseHexNumber() throws TokenizerException {
         Parser p = new Parser("0xFFAA01");
         ArrayList<ASTItem> ast = p.parse();
 
         assertEquals(ast.get(0), new NumberInt(16755201));
+        assertEquals(p.hadErrors, false);
     }
 
     @Test
-    public void parseSelf() throws TokenizerException, ParserException {
+    public void parseSelf() throws TokenizerException {
         Parser p = new Parser("self");
         ArrayList<ASTItem> ast = p.parse();
 
         assertEquals(ast.get(0), new Self());
+        assertEquals(p.hadErrors, false);
     }
 
     @Test
-    public void parseSingleQString() throws TokenizerException, ParserException {
+    public void parseSingleQString() throws TokenizerException {
         Parser p = new Parser("'something'");
         ArrayList<ASTItem> ast = p.parse();
 
         assertEquals(ast.get(0), new Str("something"));
+        assertEquals(p.hadErrors, false);
     }
 
     @Test
-    public void parseDoubleQString() throws TokenizerException, ParserException {
+    public void parseDoubleQString() throws TokenizerException {
         Parser p = new Parser("\"something\"");
         ArrayList<ASTItem> ast = p.parse();
 
         assertEquals(ast.get(0), new Str("something"));
+        assertEquals(p.hadErrors, false);
     }
 
     @Test
-    public void parseUnaryMessageSingle() throws TokenizerException, ParserException {
+    public void parseUnaryMessageSingle() throws TokenizerException {
         Parser p = new Parser("message");
         ArrayList<ASTItem> ast = p.parse();
 
         assertEquals(ast.get(0), new Send(new MessageUnary("message")));
+        assertEquals(p.hadErrors, false);
     }
 
     @Test
-    public void parseUnaryMessageToSomething() throws TokenizerException, ParserException {
+    public void parseUnaryMessageToSomething() throws TokenizerException {
         Parser p = new Parser("1 message");
         ArrayList<ASTItem> ast = p.parse();
 
         assertEquals(ast.get(0), new Send(new NumberInt(1),
                                           new MessageUnary("message")));
+        assertEquals(p.hadErrors, false);
     }
 
     @Test
-    public void parseBinaryMessage() throws TokenizerException, ParserException {
+    public void parseBinaryMessage() throws TokenizerException {
         Parser p = new Parser("1 + 2");
         ArrayList<ASTItem> ast = p.parse();
 
         assertEquals(ast.get(0), new Send(new NumberInt(1),
                                           new MessageBinary("+", new NumberInt(2))));
+        assertEquals(p.hadErrors, false);
     }
 
     @Test
-    public void parseSingleKeywordMessage() throws TokenizerException, ParserException {
+    public void parseSingleKeywordMessage() throws TokenizerException {
         Parser p = new Parser("1 send: 2");
         ArrayList<ASTItem> ast = p.parse();
 
         assertEquals(ast.get(0), new Send(new NumberInt(1),
                                           new MessageKeyword("send:", new NumberInt(2))));
+        assertEquals(p.hadErrors, false);
     }
 
     @Test
-    public void parseKeywordMessage() throws TokenizerException, ParserException {
+    public void parseKeywordMessage() throws TokenizerException {
         Parser p = new Parser("1 send: 2 And: 3");
         ArrayList<ASTItem> ast = p.parse();
 
         ArrayList<ASTItem> parameters = new ArrayList<ASTItem>(Arrays.asList(new NumberInt(2), new NumberInt(3)));
         MessageKeyword msg = new MessageKeyword("send:And:", parameters);
         assertEquals(ast.get(0), new Send(new NumberInt(1), msg));
+        assertEquals(p.hadErrors, false);
     }
 
     @Test
-    public void parseCascade() throws TokenizerException, ParserException {
+    public void parseCascade() throws TokenizerException {
         Parser p = new Parser("1 msg; another");
         ArrayList<ASTItem> ast = p.parse();
 
         ArrayList<MessageBase> messages = new ArrayList<>(Arrays.asList(new MessageUnary("msg"),
                                                                         new MessageUnary("another")));
         assertEquals(ast.get(0), new Cascade(new NumberInt(1), messages));
+        assertEquals(p.hadErrors, false);
     }
 
     @Test
-    public void parseMultiCascade() throws TokenizerException, ParserException {
+    public void parseMultiCascade() throws TokenizerException {
         Parser p = new Parser("1 msg; another; keyword: 1");
         ArrayList<ASTItem> ast = p.parse();
 
@@ -127,42 +139,47 @@ public class ParserTest {
                                                                         new MessageUnary("another"),
                                                                         new MessageKeyword("keyword:", new NumberInt(1))));
         assertEquals(ast.get(0), new Cascade(new NumberInt(1), messages));
+        assertEquals(p.hadErrors, false);
     }
 
     @Test
-    public void parseReturn() throws TokenizerException, ParserException {
+    public void parseReturn() throws TokenizerException {
         Parser p = new Parser("^ 1");
         ArrayList<ASTItem> ast = p.parse();
 
         assertEquals(ast.get(0), new Return(new NumberInt(1)));
+        assertEquals(p.hadErrors, false);
     }
 
     @Test
-    public void parseEmptyObject() throws TokenizerException, ParserException {
+    public void parseEmptyObject() throws TokenizerException {
         Parser p = new Parser("()");
         ArrayList<ASTItem> ast = p.parse();
 
         assertEquals(ast.get(0), new Obj());
+        assertEquals(p.hadErrors, false);
     }
 
     @Test
-    public void parseEmptyObjectWithOneSeparator() throws TokenizerException, ParserException {
+    public void parseEmptyObjectWithOneSeparator() throws TokenizerException {
         Parser p = new Parser("(|)");
         ArrayList<ASTItem> ast = p.parse();
 
         assertEquals(ast.get(0), new Obj());
+        assertEquals(p.hadErrors, false);
     }
 
     @Test
-    public void parseEmptyObjectWithTwoSeparators() throws TokenizerException, ParserException {
+    public void parseEmptyObjectWithTwoSeparators() throws TokenizerException {
         Parser p = new Parser("(||)");
         ArrayList<ASTItem> ast = p.parse();
 
         assertEquals(ast.get(0), new Obj());
+        assertEquals(p.hadErrors, false);
     }
 
     @Test
-    public void parseEmptyObjectWithCode() throws TokenizerException, ParserException {
+    public void parseEmptyObjectWithCode() throws TokenizerException {
         Parser p = new Parser("(|| 1 asd)");
         ArrayList<ASTItem> ast = p.parse();
 
@@ -170,10 +187,11 @@ public class ParserTest {
         o.addCode(new Send(new NumberInt(1), new MessageUnary("asd")));
 
         assertEquals(ast.get(0), o);
+        assertEquals(p.hadErrors, false);
     }
 
     @Test
-    public void parseEmptyObjectWithMultipleCodeExpr() throws TokenizerException, ParserException {
+    public void parseEmptyObjectWithMultipleCodeExpr() throws TokenizerException {
         Parser p = new Parser("(|| 1 asd. 2 xxx)");
         ArrayList<ASTItem> ast = p.parse();
 
@@ -182,10 +200,11 @@ public class ParserTest {
         o.addCode(new Send(new NumberInt(2), new MessageUnary("xxx")));
 
         assertEquals(ast.get(0), o);
+        assertEquals(p.hadErrors, false);
     }
 
     @Test
-    public void parseEmptyObjectWithMultipleCodeAndDotAtTheEnd() throws TokenizerException, ParserException {
+    public void parseEmptyObjectWithMultipleCodeAndDotAtTheEnd() throws TokenizerException {
         Parser p = new Parser("(|| 1 asd. 2 xxx.)");
         ArrayList<ASTItem> ast = p.parse();
 
@@ -194,10 +213,11 @@ public class ParserTest {
         o.addCode(new Send(new NumberInt(2), new MessageUnary("xxx")));
 
         assertEquals(ast.get(0), o);
+        assertEquals(p.hadErrors, false);
     }
 
     @Test
-    public void parseObjectWithSlot() throws TokenizerException, ParserException {
+    public void parseObjectWithSlot() throws TokenizerException {
         Parser p = new Parser("(| asd |)");
         ArrayList<ASTItem> ast = p.parse();
 
@@ -205,10 +225,11 @@ public class ParserTest {
         o.addSlot("asd", new Nil());
 
         assertEquals(ast.get(0), o);
+        assertEquals(p.hadErrors, false);
     }
 
     @Test
-    public void parseObjectWithSlotsAndOneSeparator() throws TokenizerException, ParserException {
+    public void parseObjectWithSlotsAndOneSeparator() throws TokenizerException {
         Parser p = new Parser("( asd |)");
         ArrayList<ASTItem> ast = p.parse();
 
@@ -216,10 +237,11 @@ public class ParserTest {
         o.addSlot("asd", new Nil());
 
         assertEquals(ast.get(0), o);
+        assertEquals(p.hadErrors, false);
     }
 
     @Test
-    public void parseObjectWithSlotAssign() throws TokenizerException, ParserException {
+    public void parseObjectWithSlotAssign() throws TokenizerException {
         Parser p = new Parser("(| asd = 1 |)");
         ArrayList<ASTItem> ast = p.parse();
 
@@ -227,10 +249,11 @@ public class ParserTest {
         o.addSlot("asd", new NumberInt(1));
 
         assertEquals(ast.get(0), o);
+        assertEquals(p.hadErrors, false);
     }
 
     @Test
-    public void parseObjectWithMultipleSlots() throws TokenizerException, ParserException {
+    public void parseObjectWithMultipleSlots() throws TokenizerException {
         Parser p = new Parser("(| xxx. asd = 1. |)");
         ArrayList<ASTItem> ast = p.parse();
 
@@ -239,10 +262,11 @@ public class ParserTest {
         o.addSlot("asd", new NumberInt(1));
 
         assertEquals(ast.get(0), o);
+        assertEquals(p.hadErrors, false);
     }
 
     @Test
-    public void parseObjectWithMultipleSlotsAndKw() throws TokenizerException, ParserException {
+    public void parseObjectWithMultipleSlotsAndKw() throws TokenizerException {
         Parser p = new Parser("(| xxx. asd = 1. keyword: a = (). |)");
         ArrayList<ASTItem> ast = p.parse();
 
@@ -255,10 +279,11 @@ public class ParserTest {
         o.addSlot("keyword:", obj_with_one_argument_a);
 
         assertEquals(ast.get(0), o);
+        assertEquals(p.hadErrors, false);
     }
 
     @Test
-    public void parseObjectWithMultipleSlotsAndOperator() throws TokenizerException, ParserException {
+    public void parseObjectWithMultipleSlotsAndOperator() throws TokenizerException {
         Parser p = new Parser("(| xxx. asd = 1. keyword: a = (). == b = (). |)");
         ArrayList<ASTItem> ast = p.parse();
 
@@ -275,10 +300,11 @@ public class ParserTest {
         o.addSlot("==", operator_obj);
 
         assertEquals(ast.get(0), o);
+        assertEquals(p.hadErrors, false);
     }
 
     @Test
-    public void parseObjectWithSlotsAndCode() throws TokenizerException, ParserException {
+    public void parseObjectWithSlotsAndCode() throws TokenizerException {
         Parser p = new Parser("(| xxx. asd = 1. | self xx)");
         ArrayList<ASTItem> ast = p.parse();
 
@@ -288,10 +314,11 @@ public class ParserTest {
         o.addCode(new Send(new MessageUnary("xx")));
 
         assertEquals(ast.get(0), o);
+        assertEquals(p.hadErrors, false);
     }
 
     @Test
-    public void parseObjectWithSlotsAndMultipleCodeStatements() throws TokenizerException, ParserException {
+    public void parseObjectWithSlotsAndMultipleCodeStatements() throws TokenizerException {
         Parser p = new Parser("(| xxx. asd = 1. | self xx. asd. ^ 1.)");
         ArrayList<ASTItem> ast = p.parse();
 
@@ -303,10 +330,11 @@ public class ParserTest {
         o.addCode(new Return(new NumberInt(1)));
 
         assertEquals(ast.get(0), o);
+        assertEquals(p.hadErrors, false);
     }
 
     @Test
-    public void parseBlockWithSlotsAndMultipleCodeStatements() throws TokenizerException, ParserException {
+    public void parseBlockWithSlotsAndMultipleCodeStatements() throws TokenizerException {
         Parser p = new Parser("[| xxx. asd = 1. | self xx. asd. ^ 1.]");
         ArrayList<ASTItem> ast = p.parse();
 
@@ -318,6 +346,7 @@ public class ParserTest {
         b.addCode(new Return(new NumberInt(1)));
 
         assertEquals(ast.get(0), b);
+        assertEquals(p.hadErrors, false);
     }
 
     ObjTokensInfo scanCode(String source) throws ParserException, TokenizerException {
@@ -376,7 +405,7 @@ public class ParserTest {
     }
 
     @Test
-    public void parseObjectWithParent() throws TokenizerException, ParserException {
+    public void parseObjectWithParent() throws TokenizerException {
         Parser p = new Parser("(| parent* = 1. slot = nil. |)");
         ArrayList<ASTItem> ast = p.parse();
 
@@ -385,10 +414,11 @@ public class ParserTest {
         o.addParent("parent*", new NumberInt(1));
 
         assertEquals(ast.get(0), o);
+        assertEquals(p.hadErrors, false);
     }
 
     @Test
-    public void parseResend() throws TokenizerException, ParserException {
+    public void parseResend() throws TokenizerException {
         Parser p = new Parser("(|| parent.msg)");
         ArrayList<ASTItem> ast = p.parse();
 
@@ -399,10 +429,11 @@ public class ParserTest {
         o.addCode(resend);
 
         assertEquals(ast.get(0), o);
+        assertEquals(p.hadErrors, false);
     }
 
     @Test
-    public void parseParensAsPriority() throws TokenizerException, ParserException {
+    public void parseParensAsPriority() throws TokenizerException {
         Parser p = new Parser("(| x = (1). |)");
         ArrayList<ASTItem> ast = p.parse();
 
@@ -410,10 +441,11 @@ public class ParserTest {
         o.addSlot("x", new NumberInt(1));
 
         assertEquals(ast.get(0), o);
+        assertEquals(p.hadErrors, false);
     }
 
     @Test
-    public void parseParensAsPriorityInCode() throws TokenizerException, ParserException {
+    public void parseParensAsPriorityInCode() throws TokenizerException {
         Parser p = new Parser("(| something: (1 + 1))");
         ArrayList<ASTItem> ast = p.parse();
 
@@ -424,10 +456,11 @@ public class ParserTest {
                                                                          new NumberInt(1))))));
 
         assertEquals(ast.get(0), o);
+        assertEquals(p.hadErrors, false);
     }
 
     @Test
-    public void parseParensAsPriorityDontApplyToBlocks() throws TokenizerException, ParserException {
+    public void parseParensAsPriorityDontApplyToBlocks() throws TokenizerException {
         Parser p = new Parser("(| something: [1 + 1. 10])");
         ArrayList<ASTItem> ast = p.parse();
 
@@ -441,16 +474,14 @@ public class ParserTest {
         o.addCode(new Send(new MessageKeyword("something:", b)));
 
         assertEquals(ast.get(0), o);
+        assertEquals(p.hadErrors, false);
     }
 
     @Test
-    public void parseMultipleExpressionsInParensAreError() throws TokenizerException, ParserException {
+    public void parseMultipleExpressionsInParensAreError() throws TokenizerException {
         Parser p = new Parser("(| something: (1 + 1. 2))");
         p.parse();
 
         assertEquals(p.hadErrors, true);
     }
 }
-
-
-// TODO: keyword: = 1 // keyword: 1 ve slotu chyba
