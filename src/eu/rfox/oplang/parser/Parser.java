@@ -139,12 +139,12 @@ public class Parser {
     }
 
     private ASTItem parseMessage() {
-        if (isUnaryMessage()) {
-            return parseUnaryMessage();
-        } else if (isBinaryMessage()) {
+        if (isBinaryMessage()) {
             return parseBinaryMessage();
         } else if (isKeywordMessage()) {
             return parseKeywordMessage();
+        } else if (isUnaryMessage()) {
+            return parseUnaryMessage();
         }
 
         return parseExpression();
