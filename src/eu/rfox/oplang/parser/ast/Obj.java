@@ -67,6 +67,30 @@ public class Obj implements ASTItem {
         addSlot(name, new AssignmentPrimitive());
     }
 
+    public boolean isSingleExpression() {
+        if (parents != null && ! parents.isEmpty()) {
+            return false;
+        }
+
+        if (slots != null && ! slots.isEmpty()) {
+            return false;
+        }
+
+        if (code == null || code.isEmpty()) {
+            return false;
+        }
+
+        if (code.size() > 1) {
+            return false;
+        }
+
+        return true;
+    }
+
+    public ASTItem getFirstExpression() {
+        return code.get(0);
+    }
+
     public <R> R accept(Visitor<R> visitor) {
         return visitor.visitObj(this);
     }
@@ -87,7 +111,7 @@ public class Obj implements ASTItem {
         return Objects.hash(slots, arguments, code, parents);
     }
 
-    private String objTypeForToString() {
+    protected String objTypeForToString() {
         return "Obj";
     }
 

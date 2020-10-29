@@ -400,6 +400,56 @@ public class ParserTest {
 
         assertEquals(ast.get(0), o);
     }
+
+    @Test
+    public void parseParensAsPriority() throws TokenizerException, ParserException {
+        Parser p = new Parser("(| x = (1). |)");
+        ArrayList<ASTItem> ast = p.parse();
+
+        Obj o = new Obj();
+        o.addSlot("x", new NumberInt(1));
+
+        assertEquals(ast.get(0), o);
+    }
+
+    @Test
+    public void parseParensAsPriorityInCode() throws TokenizerException, ParserException {
+        Parser p = new Parser("(| something: (1 + 1))");
+        ArrayList<ASTItem> ast = p.parse();
+
+        Obj o = new Obj();
+        o.addCode(new Send(new MessageKeyword("something:",
+                                              new Send(new NumberInt(1),
+                                                       new MessageBinary("+",
+                                                                         new NumberInt(1))))));
+
+        assertEquals(ast.get(0), o);
+    }
+
+    @Test
+    public void parseParensAsPriorityDontApplyToBlocks() throws TokenizerException, ParserException {
+        Parser p = new Parser("(| something: [1 + 1. 10])");
+        ArrayList<ASTItem> ast = p.parse();
+
+        Block b = new Block();
+        b.addCode(new Send(new NumberInt(1),
+                           new MessageBinary("+",
+                                             new NumberInt(1))));
+        b.addCode(new NumberInt(10));
+
+        Obj o = new Obj();
+        o.addCode(new Send(new MessageKeyword("something:", b)));
+
+        assertEquals(ast.get(0), o);
+    }
+
+    @Test
+    public void parseMultipleExpressionsInParensAreError() throws TokenizerException, ParserException {
+        Parser p = new Parser("(| something: (1 + 1. 2))");
+        p.parse();
+
+        assertEquals(p.hadErrors, true);
+    }
 }
 
 

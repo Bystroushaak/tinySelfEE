@@ -5,7 +5,12 @@ public class Block extends Obj {
         return visitor.visitBlock(this);
     }
 
-    private String objTypeForToString() {
+    public boolean isSingleExpression() {
+        return false;
+    }
+
+    @Override
+    protected String objTypeForToString() {
         return "Block";
     }
 }

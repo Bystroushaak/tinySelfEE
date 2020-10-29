@@ -314,10 +314,24 @@ public class Parser {
             }
 
             if (obj_info.has_code) {
+                if (obj_info.first_separator_index != -1) {
+                    advance(); // consume separator if there is one, if not, it is parens for priority
+                }
                 parseCode(new_obj, obj_end);
             }
 
             advance();
+
+            if (obj_info.first_separator_index == -1) {
+                if (new_obj.isSingleExpression()) {
+                    return new_obj.getFirstExpression();
+                } else if (obj_end != TokenType.BLOCK_END) {  // block can be multistatements as they are always objects
+                    logError("Invalid syntax; multiple expression in parens. Use (| code) syntax instead!",
+                             tokens.get(obj_info.obj_start), tokens.get(obj_info.obj_end));
+                    return new_obj.getFirstExpression();
+                }
+            }
+
             return new_obj;
         }
     }
