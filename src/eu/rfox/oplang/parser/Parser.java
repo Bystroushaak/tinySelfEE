@@ -90,8 +90,8 @@ public class Parser {
                 return parseComment();
             case RETURN:
                 return parseReturn();
-//            case NUMBER_HEX:
-//                return parseHexNumber();
+            case NUMBER_HEX:
+                return parseHexNumber();
         }
 
         if (current().type == TokenType.IDENTIFIER && current().content.equals("nil")) {
@@ -123,6 +123,10 @@ public class Parser {
 
     private ASTItem parseFloat() {
         return new NumberFloat(Float.parseFloat(advance().content));
+    }
+
+    private ASTItem parseHexNumber() {
+        return new NumberInt(Integer.decode(advance().content));
     }
 
     private ASTItem parseComment() {

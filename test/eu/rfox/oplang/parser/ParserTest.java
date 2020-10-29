@@ -32,6 +32,14 @@ public class ParserTest {
     }
 
     @Test
+    public void parseHexNumber() throws TokenizerException, ParserException {
+        Parser p = new Parser("0xFFAA01");
+        ArrayList<ASTItem> ast = p.parse();
+
+        assertEquals(ast.get(0), new NumberInt(16755201));
+    }
+
+    @Test
     public void parseSelf() throws TokenizerException, ParserException {
         Parser p = new Parser("self");
         ArrayList<ASTItem> ast = p.parse();
