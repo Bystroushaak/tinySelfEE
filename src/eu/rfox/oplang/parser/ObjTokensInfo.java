@@ -15,6 +15,8 @@ some code between them.
 class ObjTokensInfo {
     boolean has_slots;
     boolean has_code;
+    public boolean had_exception = false;
+    public ParserException exception;
 
     int obj_start = -1;
     int obj_end = -1;
@@ -23,6 +25,7 @@ class ObjTokensInfo {
 
     private ArrayList<Token> tokens;
     private int current_token_index;
+
 
     ObjTokensInfo() {
     }
@@ -40,14 +43,18 @@ class ObjTokensInfo {
         return (first_separator_index >= 0 && second_separator_index >= 0);
     }
 
-    public void scan(TokenType end_token) throws ParserException {
+    public void scan(TokenType end_token) {
         mapTokens(end_token);
+
+        if (had_exception) {
+            return;
+        }
 
         scanForSlots();
         scanForCode();
     }
 
-    private void mapTokens(TokenType end_token) throws ParserException {
+    private void mapTokens(TokenType end_token) {
         int current_index = current_token_index;
 
         obj_start = current_index;
@@ -57,7 +64,8 @@ class ObjTokensInfo {
             Token t = tokens.get(i);
 
             if (t.type == TokenType.EOF) {
-                throw new ParserException("Object's end not found.");
+                had_exception = true;
+                exception = new ParserException("Object's end not found.", tokens.get(obj_start), t);
             }
 
             if (stack_count == 0) {
@@ -70,7 +78,8 @@ class ObjTokensInfo {
                     } else if (second_separator_index == -1) {
                         second_separator_index = i;
                     } else {
-                        throw new ParserException("Too many separators!"); // consume to the end
+                        had_exception = true;
+                        exception = new ParserException("Too many separators!", t);
                     }
                 }
             }
