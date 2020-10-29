@@ -484,4 +484,32 @@ public class ParserTest {
 
         assertEquals(p.hadErrors, true);
     }
+
+    @Test
+    public void parseBlockStatement() throws TokenizerException {
+        Parser p = new Parser("[i + 1]");
+        p.parse();
+
+        // TODO: add data check
+
+        assertEquals(p.hadErrors, false);
+    }
+
+    @Test
+    public void parseMessageToTheBlock() throws TokenizerException {
+        Parser p = new Parser("(| [i + 1] doSomething: 1)");
+        ArrayList<ASTItem> ast = p.parse();
+
+        Obj o = new Obj();
+
+        Block b = new Block();
+        b.addCode(new Send(new Send(new MessageUnary("i")),
+                           new MessageBinary("+",
+                                             new NumberInt(1))));
+
+        o.addCode(new Send(b, new MessageKeyword("doSomething:", new NumberInt(1))));
+
+        assertEquals(ast.get(0), o);
+        assertEquals(p.hadErrors, false);
+    }
 }

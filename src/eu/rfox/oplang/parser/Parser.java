@@ -176,6 +176,45 @@ public class Parser {
         return check_current(TokenType.FIRST_KW) || check_next(TokenType.FIRST_KW);
     }
 
+    private ASTItem parseUnaryMessage() {
+        if (check_current(TokenType.IDENTIFIER)) {
+            return sendOrResend(new MessageUnary(advance().content));
+        }
+
+        return sendOrResend(parseExpression(), new MessageUnary(advance().content));
+    }
+
+    private ASTItem parseBinaryMessage() {
+        ASTItem receiver;
+        if (isUnaryMessage()) {
+            receiver = parseUnaryMessage();
+        } else if (isKeywordMessage()) {
+            receiver = parseKeywordMessage();
+        } else {
+            receiver = parseExpression();
+        }
+        return sendOrResend(receiver, new MessageBinary(advance().content, parseExpression()));
+    }
+
+    private ASTItem parseKeywordMessage() {
+        if (check_current(TokenType.FIRST_KW)) {
+            MessageKeyword kwd_msg = new MessageKeyword(advance().content, parseExpression());
+            return sendOrResend(tryConsumeKeywordPairs(kwd_msg));
+        }
+
+        ASTItem receiver;
+        if (isUnaryMessage()) {
+            receiver = parseUnaryMessage();
+        } else if (isBinaryMessage()) {
+            receiver = parseBinaryMessage();
+        } else {
+            receiver = parseExpression();
+        }
+
+        MessageKeyword kwd_msg = new MessageKeyword(advance().content, parseExpression());
+        return sendOrResend(receiver, tryConsumeKeywordPairs(kwd_msg));
+    }
+
     private Send sendOrResend(MessageBase msg) {
         if (msg.isResend()) {
             return new Resend(msg);
@@ -190,30 +229,6 @@ public class Parser {
         }
 
         return new Send(obj, msg);
-    }
-
-    private ASTItem parseUnaryMessage() {
-        if (check_current(TokenType.IDENTIFIER)) {
-            return sendOrResend(new MessageUnary(advance().content));
-        }
-
-        return sendOrResend(parseExpression(), new MessageUnary(advance().content));
-    }
-
-    private ASTItem parseBinaryMessage() {
-        return sendOrResend(parseExpression(), new MessageBinary(advance().content,
-                                                                 parseExpression()));
-    }
-
-    private ASTItem parseKeywordMessage() {
-        if (check_current(TokenType.FIRST_KW)) {
-            MessageKeyword kwd_msg = new MessageKeyword(advance().content, parseExpression());
-            return sendOrResend(tryConsumeKeywordPairs(kwd_msg));
-        }
-
-        ASTItem expr = parseExpression();
-        MessageKeyword kwd_msg = new MessageKeyword(advance().content, parseExpression());
-        return sendOrResend(expr, tryConsumeKeywordPairs(kwd_msg));
     }
 
     private MessageKeyword tryConsumeKeywordPairs(MessageKeyword kwd_msg) {
@@ -282,18 +297,6 @@ public class Parser {
             advance();
             advance();
             return new_obj;
-        } else if (check_current(TokenType.SEPARATOR) && check_next(TokenType.SEPARATOR)) {
-            advance();
-            advance();
-
-            if (check_current(obj_end)) {
-                advance();
-                return new_obj;
-            }
-
-            parseCode(new_obj, obj_end);
-            advance();
-            return new_obj;
         } else {
             ObjTokensInfo obj_info = new ObjTokensInfo(tokens, current_token_index);
             obj_info.scan(obj_end);
@@ -320,19 +323,24 @@ public class Parser {
                 if (check_current(obj_end)) {
                     advance();
                     return new_obj;
-                } else if (check_current(TokenType.SEPARATOR)) {
-                    advance();
                 }
             }
 
+            while (check_current(TokenType.SEPARATOR)) {
+                advance();
+            }
+
             if (obj_info.has_code) {
-                if (! obj_info.hasNoSeparator()) {
+                if (!obj_info.hasNoSeparator() && check_current(TokenType.SEPARATOR)) {
                     advance();
                 }
                 parseCode(new_obj, obj_end);
             }
             advance();  // consume end of the object
 
+//            if (check_current(TokenType.END_OF_EXPR)) {
+//                advance();
+//            }
 
             if (obj_info.hasNoSeparator()) {
                 // blocks are always objects
@@ -354,16 +362,50 @@ public class Parser {
     }
 
     private void parseCode(Obj obj, TokenType obj_end) {
-        obj.addCode(parseObjectOrBlock());
+        ArrayList<ASTItem> message_sends = new ArrayList<>();
 
-        while (check_current(TokenType.END_OF_EXPR)) {
-            advance();
-            if (check_current(obj_end)) {
-                return;
+        while (! check_current(obj_end)) {
+             message_sends.add(parseObjectOrBlock());
+
+            if (check_current(TokenType.END_OF_EXPR)) {
+                advance();
+                obj.addCode(joinMessageSends(message_sends));
+                message_sends.clear();
+            }
+        }
+
+        if (! message_sends.isEmpty()) {
+            obj.addCode(joinMessageSends(message_sends));
+        }
+    }
+
+    private ASTItem joinMessageSends(ArrayList<ASTItem> message_sends) {
+        if (message_sends.size() == 1) {
+            return message_sends.get(0);
+        }
+
+        ASTItem receiver = message_sends.remove(0);
+        while (!message_sends.isEmpty()) {
+            ASTItem message = message_sends.remove(0);
+
+            if (message instanceof Send) {
+                Send message_in_send = (Send) message;
+
+                if (message_in_send.hasDefaultSelf()) {
+                    message_in_send.obj = receiver;
+                    receiver = message_in_send;
+                    continue;
+                }
             }
 
-            obj.addCode(parseObjectOrBlock());
+            try {
+                receiver = new Send(receiver, (MessageBase) message);
+            } catch (ClassCastException e) {
+                logError(message.toString() + " can't be used as message.", current());
+            }
         }
+
+        return receiver;
     }
 
     private void parseSlotDefinition(Obj obj, TokenType obj_end) {
