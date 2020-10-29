@@ -488,9 +488,14 @@ public class ParserTest {
     @Test
     public void parseBlockStatement() throws TokenizerException {
         Parser p = new Parser("[i + 1]");
-        p.parse();
+        ArrayList<ASTItem> ast = p.parse();
 
-        // TODO: add data check
+        Block b = new Block();
+        b.addCode(new Send(new Send(new MessageUnary("i")),
+                           new MessageBinary("+",
+                                             new NumberInt(1))));
+
+        assertEquals(ast.get(0), b);
 
         assertEquals(p.hadErrors, false);
     }
