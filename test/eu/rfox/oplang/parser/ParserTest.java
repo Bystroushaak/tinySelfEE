@@ -368,6 +368,14 @@ public class ParserTest {
     }
 
     @Test
+    public void scanObjWithOneNumber() throws TokenizerException, ParserException {
+        ObjTokensInfo token_info = scanCode("1]");
+
+        assertEquals(token_info.has_slots, false);
+        assertEquals(token_info.has_code, true);
+    }
+
+    @Test
     public void parseObjectWithParent() throws TokenizerException, ParserException {
         Parser p = new Parser("(| parent* = 1. slot = nil. |)");
         ArrayList<ASTItem> ast = p.parse();

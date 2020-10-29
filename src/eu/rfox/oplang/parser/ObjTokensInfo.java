@@ -43,10 +43,6 @@ class ObjTokensInfo {
     public void scan(TokenType end_token) throws ParserException {
         mapTokens(end_token);
 
-        if (hasNoSeparator()) {
-            return;
-        }
-
         scanForSlots();
         scanForCode();
     }
@@ -89,11 +85,19 @@ class ObjTokensInfo {
     }
 
     private void scanForSlots() {
+        if (first_separator_index == -1) {  // no separator -> no slots
+            return;
+        }
+
         int start = obj_start;
         int end = first_separator_index;
         if (hasBothSeparators()) {
             start = first_separator_index;
             end = second_separator_index;
+        }
+
+        if (end == -1) {
+            end = obj_end;
         }
 
         for (int i = start; i < end; i++) {
@@ -110,6 +114,10 @@ class ObjTokensInfo {
         int start = first_separator_index;
         if (hasBothSeparators()) {
             start = second_separator_index;
+        }
+
+        if (start < obj_start) {
+            start = obj_start;
         }
 
         for (int i = start; i < obj_end; i++) {
