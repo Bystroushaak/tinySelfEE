@@ -64,6 +64,9 @@ public class Obj implements ASTItem {
     }
 
     public void addRWSlot(String name) {
+        if (! name.endsWith(":")) {
+            name = name + ":";
+        }
         addSlot(name, new AssignmentPrimitive());
     }
 

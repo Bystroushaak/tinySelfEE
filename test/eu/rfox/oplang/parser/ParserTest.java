@@ -253,6 +253,19 @@ public class ParserTest {
     }
 
     @Test
+    public void parseObjectWithRWSlotAssign() throws TokenizerException {
+        Parser p = new Parser("(| asd <- 1 |)");
+        ArrayList<ASTItem> ast = p.parse();
+
+        Obj o = new Obj();
+        o.addSlot("asd", new NumberInt(1));
+        o.addSlot("asd:", new AssignmentPrimitive());
+
+        assertEquals(ast.get(0), o);
+        assertEquals(p.hadErrors, false);
+    }
+
+    @Test
     public void parseObjectWithMultipleSlots() throws TokenizerException {
         Parser p = new Parser("(| xxx. asd = 1. |)");
         ArrayList<ASTItem> ast = p.parse();
