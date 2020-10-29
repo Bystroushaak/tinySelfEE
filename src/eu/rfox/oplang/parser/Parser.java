@@ -162,28 +162,44 @@ public class Parser {
         return check_current(TokenType.FIRST_KW) || check_next(TokenType.FIRST_KW);
     }
 
-    private ASTItem parseUnaryMessage() {
-        if (check_current(TokenType.IDENTIFIER)) {
-            return new Send(new MessageUnary(advance().content));
+    private Send sendOrResend(MessageBase msg) {
+        if (msg.isResend()) {
+            return new Resend(msg);
         }
 
-        return new Send(parseExpression(), new MessageUnary(advance().content));
+        return new Send(msg);
+    }
+
+    private Send sendOrResend(ASTItem obj, MessageBase msg) {
+        if (msg.isResend()) {
+            return new Resend(obj, msg);
+        }
+
+        return new Send(obj, msg);
+    }
+
+    private ASTItem parseUnaryMessage() {
+        if (check_current(TokenType.IDENTIFIER)) {
+            return sendOrResend(new MessageUnary(advance().content));
+        }
+
+        return sendOrResend(parseExpression(), new MessageUnary(advance().content));
     }
 
     private ASTItem parseBinaryMessage() {
-        return new Send(parseExpression(), new MessageBinary(advance().content,
+        return sendOrResend(parseExpression(), new MessageBinary(advance().content,
                                                              parseExpression()));
     }
 
     private ASTItem parseKeywordMessage() {
         if (check_current(TokenType.FIRST_KW)) {
             MessageKeyword kwd_msg = new MessageKeyword(advance().content, parseExpression());
-            return new Send(tryConsumeKeywordPairs(kwd_msg));
+            return sendOrResend(tryConsumeKeywordPairs(kwd_msg));
         }
 
         ASTItem expr = parseExpression();
         MessageKeyword kwd_msg = new MessageKeyword(advance().content, parseExpression());
-        return new Send(expr, tryConsumeKeywordPairs(kwd_msg));
+        return sendOrResend(expr, tryConsumeKeywordPairs(kwd_msg));
     }
 
     private MessageKeyword tryConsumeKeywordPairs(MessageKeyword kwd_msg) {
@@ -277,7 +293,7 @@ public class Parser {
             if (obj_info.has_slots) {
                 // consume stuff until first separator and then also that
                 if (obj_info.hasBothSeparators()) {
-                    while (! check_current(TokenType.SEPARATOR)) {
+                    while (!check_current(TokenType.SEPARATOR)) {
                         advance();
                     }
                     advance();

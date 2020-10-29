@@ -3,10 +3,8 @@ package eu.rfox.oplang.parser.ast;
 import java.util.Objects;
 
 public class MessageUnary extends MessageBase {
-    String message_name;
-
     public MessageUnary(String message_name) {
-        this.message_name = message_name;
+        super(message_name);
     }
 
     public <R> R accept(Visitor<R> visitor) {

@@ -370,6 +370,20 @@ public class ParserTest {
 
         assertEquals(ast.get(0), o);
     }
+
+    @Test
+    public void parseResend() throws TokenizerException, ParserException {
+        Parser p = new Parser("(|| parent.msg)");
+        ArrayList<ASTItem> ast = p.parse();
+
+        Resend resend = new Resend(new MessageUnary("msg"));
+        resend.parent_name = "parent";
+
+        Obj o = new Obj();
+        o.addCode(resend);
+
+        assertEquals(ast.get(0), o);
+    }
 }
 
 

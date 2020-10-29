@@ -4,18 +4,17 @@ import java.util.ArrayList;
 import java.util.Objects;
 
 public class MessageKeyword extends MessageBase {
-    String message_name;
     ArrayList<ASTItem> parameters;
 
     public MessageKeyword(String message_name, ASTItem parameter) {
-        this.message_name = message_name;
+        super(message_name);
 
         this.parameters = new ArrayList<>();
         this.parameters.add(parameter);
     }
 
     public MessageKeyword(String message_name, ArrayList<ASTItem> parameters) {
-        this.message_name = message_name;
+        super(message_name);
 
         this.parameters = new ArrayList<>();
         this.parameters.addAll(parameters);

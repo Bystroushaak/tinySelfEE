@@ -3,11 +3,10 @@ package eu.rfox.oplang.parser.ast;
 import java.util.Objects;
 
 public class MessageBinary extends MessageBase {
-    String message_name;  // TODO: move to base?
     ASTItem parameter;
 
     public MessageBinary(String message_name, ASTItem parameter) {
-        this.message_name = message_name;
+        super(message_name);
         this.parameter = parameter;
     }
 
