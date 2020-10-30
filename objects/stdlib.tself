@@ -1,0 +1,228 @@
+(|
+    init_true = (| true_mirror |
+        true_mirror: primitives mirrorOn: true.
+
+        true_mirror toSlot: 'not' Add: (|| false).
+        true_mirror toSlot: 'ifTrue:' Add: (| :blck | blck value).
+        true_mirror toSlot: 'ifFalse:' Add: (| :blck | nil.).
+        true_mirror toSlot: 'ifTrue:False:' Add: (| :true_blck. :false_blck |
+            true_blck value
+        ).
+        true_mirror toSlot: 'ifFalse:True:' Add: (| :false_blck. :true_blck |
+            true_blck value.
+        ).
+        true_mirror toSlot: 'print' Add: (||
+            "true" print.
+        ).
+        true_mirror toSlot: 'printLine' Add: (||
+            "true" printLine.
+        ).
+        true_mirror toSlot: 'asBool' Add: (||
+            ^ self.
+        ).
+        true_mirror toSlot: 'asString' Add: (||
+            "true".
+        ).
+        true_mirror toSlot: '==' Add: (| :other |
+            self is: other asBool.
+        ).
+    ).
+
+    init_false = (| false_mirror |
+        false_mirror: primitives mirrorOn: false.
+
+        false_mirror toSlot: 'not' Add: (| | true).
+        false_mirror toSlot: 'ifTrue:' Add: (| :blck | nil).
+        false_mirror toSlot: 'ifFalse:' Add: (| :blck | blck value.).
+        false_mirror toSlot: 'ifTrue:False:' Add: (| :true_blck. :false_blck |
+            false_blck value
+        ).
+        false_mirror toSlot: 'ifFalse:True:' Add: (| :false_blck. :true_blck |
+            false_blck value.
+        ).
+        false_mirror toSlot: 'print' Add: (||
+            "false" print.
+        ).
+        false_mirror toSlot: 'printLine' Add: (||
+            "false" printLine.
+        ).
+        false_mirror toSlot: 'asBool' Add: (||
+            self.
+        ).
+        false_mirror toSlot: 'asString' Add: (||
+            "false".
+        ).
+        false_mirror toSlot: '==' Add: (| :other |
+            self is: other asBool.
+        ).
+    ).
+
+    init_nil = (| nil_mirror |
+        nil_mirror: primitives mirrorOn: nil.
+
+        nil_mirror toSlot: 'asString' Add: (||
+            "nil".
+        ).
+        nil_mirror toSlot: 'print' Add: (||
+            "nil" print.
+        ).
+        nil_mirror toSlot: 'printLine' Add: (||
+            "nil" printLine.
+        ).
+        nil_mirror toSlot: 'asBool' Add: (||
+            false.
+        ).
+        nil_mirror toSlot: '==' Add: (| :other |
+            self is: other.
+        ).
+    ).
+
+    init_int = (| int_mirror |
+        int_mirror: primitives mirrorOn: traits int.
+    ).
+
+    init_float = (| float_mirror |
+        float_mirror: primitives mirrorOn: traits float.
+
+        float_mirror toSlot: 'print' Add: (||
+            self asString print.
+            self asString.
+        ).
+        float_mirror toSlot: 'printLine' Add: (||
+            (self asString + '\n') print.
+            (self asString + '\n')
+        ).
+        float_mirror toSlot: 'asBool' Add: (||
+            (self == 0.0) ifTrue: [^false].
+            true.
+        ).
+    ).
+
+    init_str = (| str_mirror |
+        str_mirror: primitives mirrorOn: traits str.
+    ).
+
+    init_asserts = (| universe_mirror |
+        universe_mirror: primitives mirrorOn: universe.
+        universe_mirror toSlot: 'assert:' Add: (| :what |
+            what value ifFalse: [
+                primitives interpreter error: (
+                    '`assert:` failed (line ' + (what getLineNumber asString) + '):\n\n\t' + (what asString)
+                )
+            ].
+            true.
+        ).
+        universe_mirror toSlot: 'assertNot:' Add: (| :what |
+            what value ifTrue: [
+                primitives interpreter error: (
+                    '`assertNot:` failed (line ' + (what getLineNumber asString) + '):\n\n\t' + (what asString)
+                )
+            ].
+            true.
+        ).
+    ).
+
+    init_blocks = (| block_traits_mirror |
+        block_traits_mirror: primitives mirrorOn: traits block.
+        block_traits_mirror toSlot: 'whileTrue:' Add: (| :blck |
+            self value ifFalse: [ ^nil ].
+            blck value.
+            ^self whileTrue: blck.
+        ).
+        block_traits_mirror toSlot: 'whileFalse:' Add: (| :blck |
+            self value ifTrue: [ ^nil ].
+            blck value.
+            ^self whileFalse: blck.
+        ).
+        block_traits_mirror toSlot: 'untilTrue:' Add: (| :blck |
+            blck value.
+            self value ifTrue: [ ^nil ].
+            ^self untilTrue: blck.
+        ).
+        block_traits_mirror toSlot: 'untilFalse:' Add: (| :blck |
+            blck value.
+            self value ifFalse: [ ^nil ].
+            ^self untilFalse: blck.
+        ).
+    ).
+
+    init_dicts = (| traits_mirror. dict_mirror. |
+        traits_mirror: primitives mirrorOn: traits.
+        traits_mirror toSlot: 'dict' Add: (|
+            at: key Fail: fail_blck = (| result |
+                result: (self at: key).
+                (result is: nil) ifTrue: [ ^ fail_blck value ].
+                ^result.
+            ).
+        |).
+
+        dict_mirror: primitives mirrorOn: dict.
+        dict_mirror toParent: 'traits' Add: traits dict.
+    ).
+
+    init_lists = (| list_mirror. traits_mirror. |
+        traits_mirror: primitives mirrorOn: traits.
+        traits_mirror toSlot: 'list' Add: (|
+            do: blk = (| size. cnt. |
+                cnt: 0.
+                size: self length.
+
+                [cnt < size] whileTrue: [
+                    blk with: (self at: cnt) With: cnt.
+                    cnt: cnt + 1.
+                ].
+            ).
+
+            == other = (||
+                primitives interpreter setErrorHandler: [:msg. :error_process |
+                    (primitives interpreter) restoreProcess: error_process With: false.
+                ].
+
+                ((self length) == (other length)) ifFalse: [ ^false ].
+
+                self do: [| :item. :index. |
+                    ((other at: index) == item) ifFalse: [ ^false ].
+                ].
+
+                ^ true.
+            ).
+
+            asBool = (||
+                (self length) == 0 ifTrue: [ ^ false ].
+                ^ true.
+            ).
+        |).
+
+        list_mirror: primitives mirrorOn: list.
+        list_mirror toParent: 'traits' Add: traits list.
+    ).
+
+    init_files = (| file_mirror |
+        file_mirror: primitives mirrorOn: primitives os files.
+
+        file_mirror toSlot: 'openForAppend:' Add: (| :fn |
+            primitives os files open: fn Mode: "a" Fails: [| :err |
+                raise: err.
+            ].
+        ).
+        file_mirror toSlot: 'openForWrite:' Add: (| :fn |
+            primitives os files open: fn Mode: "w" Fails: [| :err |
+                raise: err.
+            ].
+        ).
+    ).
+
+    init = (||
+        init_true.
+        init_false.
+        init_nil.
+        init_int.
+        init_float.
+        init_str.
+        init_asserts.
+        init_blocks.
+        init_dicts.
+        init_lists.
+        init_files.
+    ).
+|) init.
