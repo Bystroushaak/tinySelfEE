@@ -332,10 +332,6 @@ public class Parser {
             }
             advance();  // consume end of the object
 
-//            if (check_current(TokenType.END_OF_EXPR)) {
-//                advance();
-//            }
-
             if (obj_info.hasNoSeparator()) {
                 // blocks are always objects
                 if (obj_end == TokenType.BLOCK_END) {
