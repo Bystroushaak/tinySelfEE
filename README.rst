@@ -1,5 +1,7 @@
 tinySelfEE is an experimental programming language inspired by the `Self lang <http://www.selflanguage.org/>`_, with the emphasis on the word *experimental*.
 
+This specific repository is a rewrite of my original [tinySelf project](https://github.com/Bystroushaak/tinySelf) implemented in RPython (see |TODO| for reasons).
+
 I would like something like the glasswork rack you know from the chemistry pictures, but for computation.
 
 .. image:: docs/self_analogy.png
