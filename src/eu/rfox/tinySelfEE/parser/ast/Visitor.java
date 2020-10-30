@@ -16,7 +16,6 @@ public interface Visitor<R> {
     R visitMessageBinary(MessageBinary messageKeyword);
     R visitMessageKeyword(MessageKeyword messageKeyword);
     R visitMessageBase(MessageBase messageBase);
-    R visitComment(Comment comment);
     R visitCascade(Cascade cascade);
     R visitBlock(Block block);
 }

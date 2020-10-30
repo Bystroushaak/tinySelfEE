@@ -96,8 +96,6 @@ public class Parser {
                 return parseInt();
             case NUMBER_FLOAT:
                 return parseFloat();
-            case COMMENT:
-                return parseComment();
             case RETURN:
                 return parseReturn();
             case NUMBER_HEX:
@@ -137,10 +135,6 @@ public class Parser {
 
     private ASTItem parseHexNumber() {
         return new NumberInt(Integer.decode(advance().content));
-    }
-
-    private ASTItem parseComment() {
-        return new Comment(advance().content);
     }
 
     private ASTItem parseReturn() {

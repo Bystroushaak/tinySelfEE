@@ -81,11 +81,6 @@ public class ASTPrinter implements Visitor<String> {
     }
 
     @Override
-    public String visitComment(Comment comment) {
-        return "Comment";
-    }
-
-    @Override
     public String visitCascade(Cascade cascade) {
         return "Cascade";
     }
