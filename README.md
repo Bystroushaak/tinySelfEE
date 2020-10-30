@@ -10,7 +10,7 @@ The point of the experiment is not in the language itself, but in all kind of di
 
 ## Articles
 
-* (Articles about tinySelfEE)[http://blog.rfox.eu/en/Programming/tinySelf/]
+* [Articles about tinySelfEE](http://blog.rfox.eu/en/Programming/tinySelf/)
 
 ## Planning
 
