@@ -159,6 +159,9 @@ public class Parser {
     }
 
     private boolean isUnaryMessage() {
+        if (check_current(TokenType.OBJ_START, TokenType.BLOCK_START)) {
+            return false;
+        }
         return check_current(TokenType.IDENTIFIER) || check_next(TokenType.IDENTIFIER);
     }
 

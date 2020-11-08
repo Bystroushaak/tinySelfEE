@@ -534,16 +534,19 @@ public class ParserTest {
         Parser p = new Parser("(| [i + 1] doSomething: [ something ])");
         ArrayList<ASTItem> ast = p.parse();
 
-//        Obj o = new Obj();
-//
-//        Block b = new Block();
-//        b.addCode(new Send(new Send(new MessageUnary("i")),
-//                           new MessageBinary("+",
-//                                             new NumberInt(1))));
-//
-//        o.addCode(new Send(b, new MessageKeyword("doSomething:", new NumberInt(1))));
-//
-//        assertEquals(ast.get(0), o);
+        Obj o = new Obj();
+
+        Block b = new Block();
+        b.addCode(new Send(new Send(new MessageUnary("i")),
+                           new MessageBinary("+",
+                                             new NumberInt(1))));
+
+        Block second_block = new Block();
+        second_block.addCode(new Send(new MessageUnary("something")));
+
+        o.addCode(new Send(b, new MessageKeyword("doSomething:", second_block)));
+
+        assertEquals(ast.get(0), o);
         assertEquals(p.hadErrors, false);
     }
 }
