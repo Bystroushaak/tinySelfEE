@@ -91,8 +91,8 @@ public class ParserTest {
         Parser p = new Parser("1 + 2");
         ArrayList<ASTItem> ast = p.parse();
 
-        assertEquals(ast.get(0), new Send(new NumberInt(1),
-                                          new MessageBinary("+", new NumberInt(2))));
+        assertEquals(ast.get(0), new NumberInt(1));
+        assertEquals(ast.get(1), new Send(new MessageBinary("+", new NumberInt(2))));
         assertEquals(p.hadErrors, false);
     }
 
@@ -360,61 +360,6 @@ public class ParserTest {
         assertEquals(p.hadErrors, false);
     }
 
-    ObjTokensInfo scanCode(String source) throws ParserException, TokenizerException {
-        ObjTokensInfo obj_info = new ObjTokensInfo(new Tokenizer(source).tokenize(), 0);
-        obj_info.scan(TokenType.BLOCK_END);
-
-        return obj_info;
-    }
-
-    @Test
-    public void scanObjTokensWithSlotsAndCode() throws TokenizerException, ParserException {
-        ObjTokensInfo token_info = scanCode("xxx. asd = 1. | self xx. asd. ^ 1.]");
-
-        assertEquals(token_info.has_slots, true);
-        assertEquals(token_info.has_code, true);
-    }
-
-    @Test
-    public void scanObjTokensWithSlots() throws TokenizerException, ParserException {
-        ObjTokensInfo token_info = scanCode("xxx. asd = 1. |]");
-
-        assertEquals(token_info.has_slots, true);
-        assertEquals(token_info.has_code, false);
-    }
-
-    @Test
-    public void scanObjTokensWithCode() throws TokenizerException, ParserException {
-        ObjTokensInfo token_info = scanCode("| self xx. asd. ^ 1.]");
-
-        assertEquals(token_info.has_slots, false);
-        assertEquals(token_info.has_code, true);
-    }
-
-    @Test
-    public void scanObjTokensOneSlot() throws TokenizerException, ParserException {
-        ObjTokensInfo token_info = scanCode(" asd |]");
-
-        assertEquals(token_info.has_slots, true);
-        assertEquals(token_info.has_code, false);
-    }
-
-    @Test
-    public void scanObjTokensEmptyObj() throws TokenizerException, ParserException {
-        ObjTokensInfo token_info = scanCode("|]");
-
-        assertEquals(token_info.has_slots, false);
-        assertEquals(token_info.has_code, false);
-    }
-
-    @Test
-    public void scanObjWithOneNumber() throws TokenizerException, ParserException {
-        ObjTokensInfo token_info = scanCode("1]");
-
-        assertEquals(token_info.has_slots, false);
-        assertEquals(token_info.has_code, true);
-    }
-
     @Test
     public void parseObjectWithParent() throws TokenizerException {
         Parser p = new Parser("(| parent* = 1. slot = nil. |)");
@@ -548,5 +493,13 @@ public class ParserTest {
 
         assertEquals(ast.get(0), o);
         assertEquals(p.hadErrors, false);
+    }
+
+    @Test
+    public void parseComplicatedSlot() throws TokenizerException {
+        Parser p = new Parser("(| init_float = (| fm | fm toSlot: 'asBool' Add: (|| (self == 0.0) ifTrue: [^false]. true. ). |]");
+        ArrayList<ASTItem> ast = p.parse();
+
+
     }
 }
