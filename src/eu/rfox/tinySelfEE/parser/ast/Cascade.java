@@ -7,6 +7,11 @@ public class Cascade extends SendBase implements ASTItem {
     ASTItem obj;
     ArrayList<MessageBase> messages;
 
+    public Cascade(ASTItem obj) {
+        this.obj = obj;
+        this.messages = new ArrayList<>();
+    }
+
     public Cascade(ArrayList<MessageBase> messages) {
         this(new Self(), messages);
     }

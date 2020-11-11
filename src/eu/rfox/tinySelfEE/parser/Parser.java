@@ -72,10 +72,6 @@ public class Parser {
             return parseMessage();
         }
 
-        if (isCascade()) {
-            return parseCascade();
-        }
-
         if (isObjectOrBlock()) {
             return parseObjectOrBlock();
         }
@@ -159,18 +155,15 @@ public class Parser {
     }
 
     private boolean isUnaryMessage() {
-        if (check_current(TokenType.OBJ_START, TokenType.BLOCK_START)) {
-            return false;
-        }
-        return check_current(TokenType.IDENTIFIER) || check_next(TokenType.IDENTIFIER);
+        return check_current(TokenType.IDENTIFIER);
     }
 
     private boolean isBinaryMessage() {
-        return check_next(TokenType.OPERATOR, TokenType.ASSIGNMENT);
+        return check_current(TokenType.OPERATOR, TokenType.ASSIGNMENT);
     }
 
     private boolean isKeywordMessage() {
-        return check_current(TokenType.FIRST_KW) || check_next(TokenType.FIRST_KW);
+        return check_current(TokenType.FIRST_KW);
     }
 
     private ASTItem parseUnaryMessage() {
@@ -178,19 +171,12 @@ public class Parser {
             return sendOrResend(new MessageUnary(advance().content));
         }
 
+        // TODO: remove this, this should never happen (messages are joined later in parseCode)
         return sendOrResend(parseExpression(), new MessageUnary(advance().content));
     }
 
     private ASTItem parseBinaryMessage() {
-        ASTItem receiver;
-        if (isUnaryMessage()) {
-            receiver = parseUnaryMessage();
-        } else if (isKeywordMessage()) {
-            receiver = parseKeywordMessage();
-        } else {
-            receiver = parseExpression();
-        }
-        return sendOrResend(receiver, new MessageBinary(advance().content, parseExpression()));
+        return sendOrResend(new MessageBinary(advance().content, parseExpression()));
     }
 
     private ASTItem parseKeywordMessage() {
@@ -240,40 +226,13 @@ public class Parser {
         return new KeywordPair(advance().content, parseExpression());
     }
 
-    private boolean isCascade() {
-        return check_current(TokenType.CASCADE);
-    }
-
-    private ASTItem parseCascade() {
-        ASTItem expr = parseMessage();
-
-        if (check_current(TokenType.CASCADE)) {
-            Send first_send = (Send) expr;
-            Cascade cascade = new Cascade(first_send.obj, first_send.message);
-
-            advance(); // consume cascade token
-            Send another_send = (Send) parseMessage();
-            cascade.addMessage(another_send.message);
-
-            while (isCascade()) {
-                advance(); // consume cascade token
-                another_send = (Send) parseMessage();
-                cascade.addMessage(another_send.message);
-            }
-
-            return cascade;
-        }
-
-        return expr;
-    }
-
     private boolean isObjectOrBlock() {
         return check_current(TokenType.OBJ_START, TokenType.BLOCK_START);
     }
 
     private ASTItem parseObjectOrBlock() {
         if (!isObjectOrBlock()) {
-            return parseCascade(); // go back to parseExpression() via the chain of other possible expr
+            return parseExpression();
         }
 
         Obj new_obj;
@@ -358,11 +317,15 @@ public class Parser {
         ArrayList<ASTItem> message_sends = new ArrayList<>();
 
         while (! check_current(obj_end)) {
-             message_sends.add(parseObjectOrBlock());
+            message_sends.add(parseObjectOrBlock());
 
             if (check_current(TokenType.END_OF_EXPR)) {
                 advance();
                 obj.addCode(joinMessageSends(message_sends));
+                message_sends.clear();
+            } else if (check_current(TokenType.CASCADE)) {
+                advance();
+                obj.addCode(parseCascade(message_sends, obj_end));
                 message_sends.clear();
             }
         }
@@ -370,6 +333,33 @@ public class Parser {
         if (! message_sends.isEmpty()) {
             obj.addCode(joinMessageSends(message_sends));
         }
+    }
+
+    private ASTItem parseCascade(ArrayList<ASTItem> message_sends, TokenType obj_end) {
+        ASTItem receiver = message_sends.remove(0);
+
+        Cascade cascade = new Cascade(receiver);
+
+        if (message_sends.size() > 0) {
+            cascade.addMessage(((Send) joinMessageSends(message_sends)).message);
+        }
+
+        while (! check_current(obj_end, TokenType.END_OF_EXPR, TokenType.SEPARATOR)) {
+            message_sends.add(parseObjectOrBlock());
+
+            if (check_current(TokenType.CASCADE)) {
+                advance();
+                cascade.addMessage(((Send) joinMessageSends(message_sends)).message);
+            } else if (check_current(obj_end, TokenType.END_OF_EXPR)) {
+                break;
+            }
+        }
+
+        if (message_sends.size() > 0) {
+            cascade.addMessage(((Send) joinMessageSends(message_sends)).message);
+        }
+
+        return cascade;
     }
 
     private ASTItem joinMessageSends(ArrayList<ASTItem> message_sends) {
