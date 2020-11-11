@@ -78,7 +78,7 @@ public class ParserTest {
 
     @Test
     public void parseUnaryMessageToSomething() throws TokenizerException {
-        Parser p = new Parser("1 message");
+        Parser p = new Parser("(1 message)");
         ArrayList<ASTItem> ast = p.parse();
 
         assertEquals(ast.get(0), new Send(new NumberInt(1),
@@ -98,7 +98,7 @@ public class ParserTest {
 
     @Test
     public void parseSingleKeywordMessage() throws TokenizerException {
-        Parser p = new Parser("1 send: 2");
+        Parser p = new Parser("(1 send: 2)");
         ArrayList<ASTItem> ast = p.parse();
 
         assertEquals(ast.get(0), new Send(new NumberInt(1),
@@ -108,7 +108,7 @@ public class ParserTest {
 
     @Test
     public void parseKeywordMessage() throws TokenizerException {
-        Parser p = new Parser("1 send: 2 And: 3");
+        Parser p = new Parser("(1 send: 2 And: 3)");
         ArrayList<ASTItem> ast = p.parse();
 
         ArrayList<ASTItem> parameters = new ArrayList<ASTItem>(Arrays.asList(new NumberInt(2), new NumberInt(3)));
@@ -119,18 +119,22 @@ public class ParserTest {
 
     @Test
     public void parseCascade() throws TokenizerException {
-        Parser p = new Parser("1 msg; another");
+        Parser p = new Parser("(| 1 msg; another)");
         ArrayList<ASTItem> ast = p.parse();
 
         ArrayList<MessageBase> messages = new ArrayList<>(Arrays.asList(new MessageUnary("msg"),
                                                                         new MessageUnary("another")));
-        assertEquals(ast.get(0), new Cascade(new NumberInt(1), messages));
+
+        Obj o = new Obj();
+        o.addCode(new Cascade(new NumberInt(1), messages));
+
+        assertEquals(ast.get(0), o);
         assertEquals(p.hadErrors, false);
     }
 
     @Test
     public void parseMultiCascade() throws TokenizerException {
-        Parser p = new Parser("1 msg; another; keyword: 1");
+        Parser p = new Parser("(1 msg; another; keyword: 1)");
         ArrayList<ASTItem> ast = p.parse();
 
         ArrayList<MessageBase> messages = new ArrayList<>(Arrays.asList(new MessageUnary("msg"),
@@ -497,7 +501,7 @@ public class ParserTest {
 
     @Test
     public void parseComplicatedSlot() throws TokenizerException {
-        Parser p = new Parser("(| init_float = (| fm | fm toSlot: 'asBool' Add: (|| (self == 0.0) ifTrue: [^false]. true. ). |]");
+        Parser p = new Parser("(f t: 'a' A: ((self == 0.0) ifTrue: [^f]. ).)");
         ArrayList<ASTItem> ast = p.parse();
 
 
