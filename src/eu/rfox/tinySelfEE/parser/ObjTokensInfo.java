@@ -66,6 +66,7 @@ class ObjTokensInfo {
             if (t.type == TokenType.EOF) {
                 had_exception = true;
                 exception = new ParserException("Object's end not found.", tokens.get(obj_start), t);
+                break;
             }
 
             if (stack_count == 0) {
@@ -89,6 +90,10 @@ class ObjTokensInfo {
                 stack_count++;
             } else if (t.type == TokenType.OBJ_END || t.type == TokenType.BLOCK_END) {
                 stack_count--;
+                if (stack_count < 0) {
+                    had_exception = true;
+                    exception = new ParserException("Object was closed too soon.", t);
+                }
             }
         }
     }
