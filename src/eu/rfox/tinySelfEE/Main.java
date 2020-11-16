@@ -14,11 +14,9 @@ import java.nio.file.Paths;
 import java.nio.charset.StandardCharsets;
 
 public class Main {
-    private static boolean hadError;
-
     public static void main(String[] args) throws IOException, TokenizerException, ParserException {
         if (args.length > 1) {
-            System.err.println("Usage: oplang [script]");
+            System.err.println("Usage: tinySelfEE [script]");
             System.exit(1);
         } else if (args.length == 1) {
             runFile(args[0]);
@@ -49,10 +47,5 @@ public class Main {
         for (ASTItem item : ast) {
             System.out.println(item.toString());
         }
-    }
-
-    private static void reportError(int line, String where, String message) {
-        System.err.println("[Line " + line + "] error " + where + ": " + message);
-        hadError = true;
     }
 }
