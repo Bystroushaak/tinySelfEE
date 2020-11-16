@@ -35,32 +35,20 @@ public class Main {
     private static void runFile(String file_path) throws IOException, TokenizerException, ParserException {
         byte[] bytes = Files.readAllBytes(Paths.get(file_path));
         String source_code = new String(bytes, StandardCharsets.UTF_8);
+        String[] source_lines = source_code.split(System.getProperty("line.separator"));
 
-        try {
-            Parser parser = new Parser(source_code);
-            ArrayList<ASTItem> ast = parser.parse();
+        Parser parser = new Parser(source_code);
+        ArrayList<ASTItem> ast = parser.parse();
 
-            for (ASTItem item : ast) {
-                System.out.println(item.toString());
+        if (parser.hadErrors) {
+            for (ParserException e: parser.exceptions) {
+                e.prettify(source_lines, System.err);
             }
-        } catch (UnexpectedTokenException e) {
-            System.err.println("Unexpected token `" + e.token.content + "` on line " + e.token.line + ";");
-            String[] lines = source_code.split(System.getProperty("line.separator"));
-            System.err.println(lines[e.token.line - 1]);
-
-            for (int i = 0; i < e.token.start; i++) {
-                System.err.print("-");
-            }
-            System.err.println("^");
-        } catch (UnterminatedStringException e) {
-            System.err.println("Unterminated string on line " + e.token.line + ":\n" + e.token.content);
-        } catch (TokenizerException e) {
-            System.err.println("Invalid token: " + e.token.toString());
         }
-    }
 
-    static void error(int line, String message) {
-        reportError(line, "", message);
+        for (ASTItem item : ast) {
+            System.out.println(item.toString());
+        }
     }
 
     private static void reportError(int line, String where, String message) {

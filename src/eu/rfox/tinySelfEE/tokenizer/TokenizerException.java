@@ -1,16 +1,17 @@
 package eu.rfox.tinySelfEE.tokenizer;
 
-public class TokenizerException extends Exception {
-    public Token token;
+import eu.rfox.tinySelfEE.parser.ParserException;
 
-    TokenizerException(Token token) {
-        super("");
-        this.token = token;
+import java.io.PrintStream;
+
+public class TokenizerException extends ParserException {
+    public TokenizerException(Token token) {
+        super(token);
     }
 
     @Override
     public String toString() {
-        return token.toString();
+        return token_start.toString();
     }
 
     public void prettify(String[] source_lines, PrintStream writer) {

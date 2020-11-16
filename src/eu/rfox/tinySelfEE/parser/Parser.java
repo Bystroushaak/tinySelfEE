@@ -4,7 +4,6 @@ import eu.rfox.tinySelfEE.parser.ast.*;
 import eu.rfox.tinySelfEE.tokenizer.Token;
 import eu.rfox.tinySelfEE.tokenizer.TokenType;
 import eu.rfox.tinySelfEE.tokenizer.Tokenizer;
-import eu.rfox.tinySelfEE.tokenizer.TokenizerException;
 
 import eu.rfox.tinySelfEE.parser.ast.ASTItem;
 
@@ -27,7 +26,7 @@ class SlotnameAndArguments {
 public class Parser {
     private String source_code;
     ArrayList<ASTItem> ast = new ArrayList<>();
-    private ArrayList<ParserException> errors = new ArrayList<>();
+    public ArrayList<ParserException> exceptions = new ArrayList<>();
     public boolean hadErrors = false;
 
     ArrayList<Token> tokens;
@@ -39,7 +38,7 @@ public class Parser {
 
     private void logError(ParserException exc) {
         hadErrors = true;
-        errors.add(exc);
+        exceptions.add(exc);
     }
 
     private void logError(String message, Token start, Token end) {
@@ -50,9 +49,14 @@ public class Parser {
         logError(message, start, null);
     }
 
-    public ArrayList<ASTItem> parse() throws TokenizerException {
+    public ArrayList<ASTItem> parse() {
         Tokenizer tokenizer = new Tokenizer(source_code);
         tokens = tokenizer.tokenize();
+
+        if (tokenizer.hadErrors) {
+            hadErrors = true;
+            exceptions.addAll(tokenizer.exceptions);
+        }
 
         while (!isAtEnd()) {
             ASTItem item = parseObjectOrBlock();
@@ -76,7 +80,12 @@ public class Parser {
             return parseObjectOrBlock();
         }
 
-        logError("Unrecognized token.", current());
+        if (lastTokenAndDot()) {
+            advance();
+            return null;
+        }
+
+        logError("Unexpected token `" + current().content + "`", current());
         advance();
         return null;
     }
@@ -495,6 +504,14 @@ public class Parser {
                 advance();
                 return true;
             }
+        }
+
+        return false;
+    }
+
+    private boolean lastTokenAndDot() {
+        if (check_next(TokenType.EOF) && check_current(TokenType.END_OF_EXPR)) {
+            return true;
         }
 
         return false;
