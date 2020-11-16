@@ -12,5 +12,15 @@ public class TokenizerException extends Exception {
     public String toString() {
         return token.toString();
     }
+
+    public void prettify(String[] source_lines, PrintStream writer) {
+        writer.println("Unexpected token `" + this.token_start.content + "` on line " + this.token_start.line + ";");
+        writer.println(source_lines[this.token_start.line - 1]);
+
+        for (int i = 0; i < this.token_start.start; i++) {
+            writer.print("-");
+        }
+        writer.println("^");
+    }
 }
 

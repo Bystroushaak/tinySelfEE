@@ -11,15 +11,24 @@ public class Tokenizer {
 
     private final String source;
     private ArrayList<Token> tokens = new ArrayList<Token>();
+    public ArrayList<TokenizerException> exceptions = new ArrayList<TokenizerException>();
+
+    public boolean hadErrors = false;
 
     public Tokenizer(String source) {
         this.source = source;
     }
 
-    public ArrayList<Token> tokenize() throws TokenizerException {
+    public ArrayList<Token> tokenize() {
         while (!this.isAtEnd()) {
             start_char_index = current_char_index;
-            scanToken();
+
+            try {
+                scanToken();
+            } catch (TokenizerException e) {
+                exceptions.add(e);
+                hadErrors = true;
+            }
         }
         tokens.add(new Token("", TokenType.EOF, last_lineno));
         return tokens;
