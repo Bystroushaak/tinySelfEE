@@ -385,6 +385,7 @@ public class Parser {
 
                 if (message_in_send.hasDefaultSelf()) {
                     message_in_send.obj = receiver;
+                    message_in_send.hasDefaultSelf(false);
                     receiver = message_in_send;
                     continue;
                 }

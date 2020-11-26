@@ -3,6 +3,7 @@ package eu.rfox.tinySelfEE;
 import eu.rfox.tinySelfEE.parser.Parser;
 import eu.rfox.tinySelfEE.parser.ParserException;
 import eu.rfox.tinySelfEE.parser.ast.ASTItem;
+import eu.rfox.tinySelfEE.parser.ast.ASTPrinter;
 import eu.rfox.tinySelfEE.tokenizer.TokenizerException;
 import eu.rfox.tinySelfEE.tokenizer.UnexpectedTokenException;
 import eu.rfox.tinySelfEE.tokenizer.UnterminatedStringException;
@@ -46,6 +47,11 @@ public class Main {
 
         for (ASTItem item : ast) {
             System.out.println(item.toString());
+        }
+
+        for (ASTItem item : ast) {
+            ASTPrinter printer = new ASTPrinter();
+            System.out.println(printer.print(item));
         }
     }
 }
