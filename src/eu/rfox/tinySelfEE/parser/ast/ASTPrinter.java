@@ -69,12 +69,20 @@ public class ASTPrinter implements Visitor<String> {
         return formatObjOrBlock(block, false);
     }
 
-    private String formatObjOrBlock(Obj object, boolean format_obj) {
+    private String formatObjOrBlock(Obj object, boolean format_as_obj) {
         String out;
-        if (format_obj) {
+        if (format_as_obj) {
             out = "(";
         } else {
             out = "[";
+        }
+
+        if (object.isSingleExpression()) {
+            if (object.code != null) {
+                out += object.code.get(0).accept(this);
+            }
+
+            return out + (format_as_obj ? ")" : "]");
         }
 
         indentation++;
@@ -97,7 +105,7 @@ public class ASTPrinter implements Visitor<String> {
         if (object.arguments != null) {
             out += "\n";
             for (String argument : object.arguments) {
-                out += getIndent() + ":" + argument + ".";
+                out += getIndent() + ":" + argument + ".\n";
             }
         }
 
@@ -133,7 +141,7 @@ public class ASTPrinter implements Visitor<String> {
         }
 
 
-        if (format_obj) {
+        if (format_as_obj) {
             return out + ")";
         }
 
