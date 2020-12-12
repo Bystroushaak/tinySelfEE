@@ -4,9 +4,6 @@ import eu.rfox.tinySelfEE.parser.Parser;
 import eu.rfox.tinySelfEE.parser.ParserException;
 import eu.rfox.tinySelfEE.parser.ast.ASTItem;
 import eu.rfox.tinySelfEE.parser.ast.ASTPrinter;
-import eu.rfox.tinySelfEE.tokenizer.TokenizerException;
-import eu.rfox.tinySelfEE.tokenizer.UnexpectedTokenException;
-import eu.rfox.tinySelfEE.tokenizer.UnterminatedStringException;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -15,7 +12,7 @@ import java.nio.file.Paths;
 import java.nio.charset.StandardCharsets;
 
 public class Main {
-    public static void main(String[] args) throws IOException, TokenizerException, ParserException {
+    public static void main(String[] args) throws IOException {
         if (args.length > 1) {
             System.err.println("Usage: tinySelfEE [script]");
             System.exit(1);
@@ -32,7 +29,7 @@ public class Main {
         System.exit(1);
     }
 
-    private static void runFile(String file_path) throws IOException, TokenizerException, ParserException {
+    private static void runFile(String file_path) throws IOException {
         byte[] bytes = Files.readAllBytes(Paths.get(file_path));
         String source_code = new String(bytes, StandardCharsets.UTF_8);
         String[] source_lines = source_code.split(System.getProperty("line.separator"));
