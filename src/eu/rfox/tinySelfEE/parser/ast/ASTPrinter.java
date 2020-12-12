@@ -116,7 +116,7 @@ public class ASTPrinter implements Visitor<String> {
         }
 
         indentation--;
-        if (object.parents != null || object.slots != null) {
+        if (object.parents != null || object.slots != null || object.arguments != null) {
             out += getIndent() + "|";
         }
 
