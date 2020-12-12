@@ -27,7 +27,8 @@ public class Main {
     }
 
     private static void runPrompt() {
-        System.err.println("Invalid arguments.");
+        System.err.println("Prompt is not implemented at the moment.");
+        System.err.println("Usage: tinySelfEE [script]");
         System.exit(1);
     }
 
