@@ -2,6 +2,7 @@ package eu.rfox.tinySelfEE.parser.ast;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.Objects;
 
 public class Obj implements ASTItem {
@@ -49,7 +50,7 @@ public class Obj implements ASTItem {
         }
 
         if (slots == null) {
-            slots = new HashMap<>();
+            slots = new LinkedHashMap<>();
         }
 
         slots.put(name, value);
@@ -57,7 +58,7 @@ public class Obj implements ASTItem {
 
     public void addParent(String name, ASTItem value) {
         if (parents == null) {
-            parents = new HashMap<>();
+            parents = new LinkedHashMap<>();
         }
 
         parents.put(name, value);
