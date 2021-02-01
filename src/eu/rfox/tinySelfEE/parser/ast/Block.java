@@ -5,6 +5,9 @@ public class Block extends Obj {
         return visitor.visitBlock(this);
     }
 
+    /**
+     * Used to detect if the object is really object or just parens for priority.
+     */
     public boolean isSingleExpression() {
         return false;
     }
