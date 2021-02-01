@@ -1,9 +1,8 @@
 package eu.rfox.tinySelfEE.parser.ast;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.LinkedHashMap;
-import java.util.Objects;
+import eu.rfox.tinySelfEE.vm.object_layout.symbolic.SymbolicObject;
+
+import java.util.*;
 
 public class Obj implements ASTItem {
     HashMap<String, ASTItem> slots;
@@ -65,18 +64,21 @@ public class Obj implements ASTItem {
     }
 
     public void addRWSlot(String name) {
-        if (! name.endsWith(":")) {
+        if (!name.endsWith(":")) {
             name = name + ":";
         }
         addSlot(name, new AssignmentPrimitive());
     }
 
+    /**
+     * Used to detect if the object is really object or just parens for priority.
+     */
     public boolean isSingleExpression() {
-        if (parents != null && ! parents.isEmpty()) {
+        if (parents != null && !parents.isEmpty()) {
             return false;
         }
 
-        if (slots != null && ! slots.isEmpty()) {
+        if (slots != null && !slots.isEmpty()) {
             return false;
         }
 
@@ -127,5 +129,42 @@ public class Obj implements ASTItem {
                 ", arguments=" + arguments +
                 ", code=" + code +
                 '}';
+    }
+
+    public SymbolicObject toSymbolicLayout(SymbolicObject scope_parent) {
+        SymbolicObject o = new SymbolicObject();
+        return this.toSymbolicLayout(scope_parent, o);
+    }
+
+    public SymbolicObject toSymbolicLayout(SymbolicObject scope_parent, SymbolicObject o) {
+        if (scope_parent != null) {
+            o.setScopeParent(scope_parent);
+        }
+
+        if (this.slots != null) {
+            for (Map.Entry<String, ASTItem> entry : slots.entrySet()) {
+                Obj ast_obj = (Obj) entry.getValue();
+                o.setSlot(entry.getKey(), ast_obj.toSymbolicLayout(o));
+            }
+        }
+
+        if (this.parents != null) {
+            for (Map.Entry<String, ASTItem> entry : parents.entrySet()) {
+                Obj ast_parent = (Obj) entry.getValue();
+                o.setParent(entry.getKey(), ast_parent.toSymbolicLayout(null));
+            }
+        }
+
+        if (this.arguments != null) {
+            o.addArguments(this.arguments);
+        }
+
+        if (this.code != null) {
+            for (ASTItem message: this.code) {
+                o.addMessage(((MessageBase) message).toSymbolicMessage());
+            }
+        }
+
+        return o;
     }
 }

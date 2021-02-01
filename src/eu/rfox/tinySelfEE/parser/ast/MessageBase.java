@@ -1,5 +1,7 @@
 package eu.rfox.tinySelfEE.parser.ast;
 
+import eu.rfox.tinySelfEE.vm.object_layout.symbolic.SymbolicMessageSend;
+
 public abstract class MessageBase implements ASTItem {
     String message_name;
 
@@ -21,5 +23,9 @@ public abstract class MessageBase implements ASTItem {
 
     public <R> R accept(Visitor<R> visitor) {
         return visitor.visitMessageBase(this);
+    }
+
+    public SymbolicMessageSend toSymbolicMessage() {
+        return null;
     }
 }
