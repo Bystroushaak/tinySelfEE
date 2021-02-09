@@ -8,11 +8,11 @@ import org.junit.Test;
 
 public class BareObjectTest {
     public ObjectInterface getEmptyObject() {
-        return new BareObject();
+        return getInstance();
     }
 
     public ObjectInterface getObjectWithOneSlot() {
-        BareObject o = new BareObject();
+        ObjectInterface o = getInstance();
 
         o.setSlot("first", PrimitiveNil.getInstance());
 
@@ -20,7 +20,7 @@ public class BareObjectTest {
     }
 
     public ObjectInterface getObjectTwoSlots() {
-        BareObject o = new BareObject();
+        ObjectInterface o = getInstance();
 
         o.setSlot("first", PrimitiveNil.getInstance());
         o.setSlot("second", PrimitiveNil.getInstance());
@@ -29,12 +29,12 @@ public class BareObjectTest {
     }
 
     public ObjectInterface getObjectWithScopeParent() {
-        BareObject o = new BareObject();
+        ObjectInterface o = getInstance();
 
         o.setSlot("first", PrimitiveNil.getInstance());
         o.setSlot("second", PrimitiveNil.getInstance());
 
-        BareObject sp = new BareObject();
+        ObjectInterface sp = getInstance();
         sp.setSlot("third", PrimitiveNil.getInstance());
         o.setScopeParent(sp);
 
@@ -42,16 +42,16 @@ public class BareObjectTest {
     }
 
     public ObjectInterface getObjectWithScopeParentAndParents() {
-        BareObject o = new BareObject();
+        ObjectInterface o = getInstance();
 
         o.setSlot("first", PrimitiveNil.getInstance());
         o.setSlot("second", PrimitiveNil.getInstance());
 
-        BareObject sp = new BareObject();
+        ObjectInterface sp = getInstance();
         sp.setSlot("third", PrimitiveNil.getInstance());
         o.setScopeParent(sp);
 
-        BareObject p = new BareObject();
+        ObjectInterface p = getInstance();
         p.setSlot("fourth", PrimitiveNil.getInstance());
         o.setParent("parent", p);
 
@@ -80,25 +80,25 @@ public class BareObjectTest {
             |).
          |)
          */
-        BareObject o = new BareObject();
+        ObjectInterface o = getInstance();
 
         o.setSlot("first", PrimitiveNil.getInstance());
         o.setSlot("second", PrimitiveNil.getInstance());
 
-        BareObject scope_parent = new BareObject();
+        ObjectInterface scope_parent = getInstance();
         scope_parent.setSlot("third", PrimitiveNil.getInstance());
         o.setScopeParent(scope_parent);
 
-        BareObject parent = new BareObject();
+        ObjectInterface parent = getInstance();
         parent.setSlot("fourth", PrimitiveNil.getInstance());
         parent.setSlot("conflict", PrimitiveNil.getInstance());
         o.setParent("parent", parent);
 
-        BareObject anotherParent = new BareObject();
+        ObjectInterface anotherParent = getInstance();
         anotherParent.setSlot("shadowed", PrimitiveNil.getInstance());
         o.setParent("anotherParent", anotherParent);
 
-        BareObject superparent = new BareObject();
+        ObjectInterface superparent = getInstance();
         superparent.setSlot("conflict", PrimitiveNil.getInstance());  // add multiple slots with same name
         superparent.setSlot("shadowed", PrimitiveTrue.getInstance());
         anotherParent.setParent("superParent", superparent);
@@ -107,6 +107,10 @@ public class BareObjectTest {
         superparent.setScopeParent(parent);
 
         return o;
+    }
+
+    public BareObject getInstance() {
+        return new BareObject();
     }
 
     @Test
