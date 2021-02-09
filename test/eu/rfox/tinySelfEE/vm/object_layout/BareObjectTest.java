@@ -201,5 +201,12 @@ public class BareObjectTest {
         assertEquals(clone.slotLookup("third"), PrimitiveNil.getInstance());
         assertEquals(clone.slotLookup("fourth"), PrimitiveNil.getInstance());
         assertEquals(clone.slotLookup("fifth"), null);
+
+        clone.setSlot("new", PrimitiveNil.getInstance());
+
+        assertEquals(o.slotLookup("new"), null);
+        assertEquals(clone.slotLookup("new"), PrimitiveNil.getInstance());
+
+        assertNotEquals(o.getId(), clone.getId());
     }
 }

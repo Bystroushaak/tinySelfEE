@@ -67,12 +67,17 @@ public class BareObject implements ObjectInterface {
         o.code = this.code;  // TODO!
 
         if (this.arguments != null) {
-            o.addArguments(this.arguments);
+            o.addArguments((ArrayList<String>) this.arguments.clone());
         }
         o.setScopeParent(this.scope_parent);
 
-        o.setSlots(this.slots);
-        o.setParents(this.parent_slots);
+        if (this.slots != null) {
+            o.setSlots((HashMap<String, ObjectInterface>) this.slots.clone());
+        }
+
+        if (this.parent_slots != null) {
+            o.setParents((HashMap<String, ObjectInterface>) this.parent_slots.clone());
+        }
 
         return o;
     }
