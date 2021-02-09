@@ -14,4 +14,11 @@ public class AssignmentPrimitive implements ASTItem {
 
         return false;
     }
+
+    public boolean wasInParens() {
+        return false;
+    }
+
+    public void wasInParens(boolean was_in_parens) {
+    }
 }

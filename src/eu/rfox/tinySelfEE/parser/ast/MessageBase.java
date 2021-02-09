@@ -3,6 +3,7 @@ package eu.rfox.tinySelfEE.parser.ast;
 import eu.rfox.tinySelfEE.vm.object_layout.symbolic.SymbolicMessageSend;
 
 public abstract class MessageBase implements ASTItem {
+    boolean was_in_parens = false;
     String message_name;
 
     public MessageBase(String message_name) {
@@ -27,5 +28,13 @@ public abstract class MessageBase implements ASTItem {
 
     public SymbolicMessageSend toSymbolicMessage() {
         return null;
+    }
+
+    public boolean wasInParens() {
+        return this.was_in_parens;
+    }
+
+    public void wasInParens(boolean was_in_parens) {
+        this.was_in_parens = was_in_parens;
     }
 }

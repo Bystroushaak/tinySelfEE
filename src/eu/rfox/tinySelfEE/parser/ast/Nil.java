@@ -1,6 +1,7 @@
 package eu.rfox.tinySelfEE.parser.ast;
 
 public class Nil implements ASTItem {
+    boolean was_in_parens = false;
     public Nil() {
     }
 
@@ -21,5 +22,13 @@ public class Nil implements ASTItem {
     @Override
     public String toString() {
         return "Nil{}";
+    }
+
+    public boolean wasInParens() {
+        return this.was_in_parens;
+    }
+
+    public void wasInParens(boolean was_in_parens) {
+        this.was_in_parens = was_in_parens;
     }
 }

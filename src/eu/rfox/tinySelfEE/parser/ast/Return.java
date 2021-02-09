@@ -3,6 +3,7 @@ package eu.rfox.tinySelfEE.parser.ast;
 import java.util.Objects;
 
 public class Return implements ASTItem {
+    boolean was_in_parens = false;
     ASTItem value;
 
     public Return(ASTItem value) {
@@ -31,5 +32,13 @@ public class Return implements ASTItem {
         return "Return{" +
                 "value=" + value +
                 '}';
+    }
+
+    public boolean wasInParens() {
+        return this.was_in_parens;
+    }
+
+    public void wasInParens(boolean was_in_parens) {
+        this.was_in_parens = was_in_parens;
     }
 }

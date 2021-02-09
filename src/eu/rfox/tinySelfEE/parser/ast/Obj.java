@@ -5,6 +5,7 @@ import eu.rfox.tinySelfEE.vm.object_layout.symbolic.SymbolicObject;
 import java.util.*;
 
 public class Obj implements ASTItem {
+    boolean was_in_parens = false;
     HashMap<String, ASTItem> slots;
     ArrayList<String> arguments;
     ArrayList<ASTItem> code;
@@ -166,5 +167,13 @@ public class Obj implements ASTItem {
         }
 
         return o;
+    }
+
+    public boolean wasInParens() {
+        return this.was_in_parens;
+    }
+
+    public void wasInParens(boolean was_in_parens) {
+        this.was_in_parens = was_in_parens;
     }
 }

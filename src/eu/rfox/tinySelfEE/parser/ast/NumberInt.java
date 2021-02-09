@@ -3,6 +3,7 @@ package eu.rfox.tinySelfEE.parser.ast;
 import java.util.Objects;
 
 public class NumberInt implements ASTItem {
+    boolean was_in_parens = false;
     int value;
 
     public NumberInt(int value) {
@@ -29,5 +30,13 @@ public class NumberInt implements ASTItem {
         return "NumberInt{" +
                 "value=" + value +
                 '}';
+    }
+
+    public boolean wasInParens() {
+        return this.was_in_parens;
+    }
+
+    public void wasInParens(boolean was_in_parens) {
+        this.was_in_parens = was_in_parens;
     }
 }

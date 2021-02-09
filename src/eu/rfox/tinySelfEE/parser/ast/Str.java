@@ -4,6 +4,8 @@ import java.util.Objects;
 
 public class Str implements ASTItem {
     String value;
+    boolean was_in_parens = false;
+
     public Str(String value) {
         this.value = value;
     }
@@ -34,5 +36,13 @@ public class Str implements ASTItem {
         return "Str{" +
                 "value='" + value + '\'' +
                 '}';
+    }
+
+    public boolean wasInParens() {
+        return this.was_in_parens;
+    }
+
+    public void wasInParens(boolean was_in_parens) {
+        this.was_in_parens = was_in_parens;
     }
 }

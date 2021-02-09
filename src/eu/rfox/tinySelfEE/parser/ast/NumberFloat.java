@@ -4,6 +4,7 @@ import java.util.Objects;
 
 // TODO: convert to double
 public class NumberFloat implements ASTItem {
+    boolean was_in_parens = false;
     float value;
 
     public NumberFloat(float value) {
@@ -25,5 +26,13 @@ public class NumberFloat implements ASTItem {
     @Override
     public int hashCode() {
         return Objects.hash(value);
+    }
+
+    public boolean wasInParens() {
+        return this.was_in_parens;
+    }
+
+    public void wasInParens(boolean was_in_parens) {
+        this.was_in_parens = was_in_parens;
     }
 }

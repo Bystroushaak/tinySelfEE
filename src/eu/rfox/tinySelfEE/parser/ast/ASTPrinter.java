@@ -19,6 +19,14 @@ public class ASTPrinter implements Visitor<String> {
         return out;
     }
 
+    private String printParens(String out, ASTItem item) {
+        if (item.wasInParens()) {
+            return "(" + out + ")";
+        }
+
+        return out;
+    }
+
     @Override
     public String visitAssignmentPrimitive(AssignmentPrimitive expr) {
         return "AssignmentPrimitive";
@@ -36,7 +44,8 @@ public class ASTPrinter implements Visitor<String> {
         if (!send.hasDefaultSelf()) {
             out = send.obj.accept(this) + " ";
         }
-        return out + send.message.accept(this);
+
+        return printParens(out + send.message.accept(this), send);
     }
 
     @Override
@@ -150,12 +159,12 @@ public class ASTPrinter implements Visitor<String> {
 
     @Override
     public String visitResend(Resend resend) {
-        return resend.parent_name + "." + resend.message.message_name;
+        return printParens(resend.parent_name + "." + resend.message.message_name, resend);
     }
 
     @Override
     public String visitReturn(Return aReturn) {
-        return "^ " + aReturn.value.accept(this);
+        return printParens("^ " + aReturn.value.accept(this), aReturn);
     }
 
     @Override
@@ -165,12 +174,13 @@ public class ASTPrinter implements Visitor<String> {
 
     @Override
     public String visitMessageUnary(MessageUnary messageUnary) {
-        return messageUnary.message_name;
+        return printParens(messageUnary.message_name, messageUnary);
     }
 
     @Override
     public String visitMessageBinary(MessageBinary messageBinary) {
-        return messageBinary.message_name + " " + messageBinary.parameter.accept(this);
+        return printParens(messageBinary.message_name + " " + messageBinary.parameter.accept(this),
+                           messageBinary);
     }
 
     @Override
@@ -182,7 +192,7 @@ public class ASTPrinter implements Visitor<String> {
             out += message_segments[i] + ": " + messageKeyword.parameters.get(i).accept(this) + " ";
         }
 
-        return out.substring(0, out.length() - 1);
+        return printParens(out.substring(0, out.length() - 1), messageKeyword);
     }
 
     @Override
@@ -196,6 +206,6 @@ public class ASTPrinter implements Visitor<String> {
 
         List<String> messages = cascade.messages.stream().map(v -> v.accept(this)).collect(Collectors.toList());
 
-        return out + String.join(";\n" + getIndent(), messages);
+        return printParens(out + String.join(";\n" + getIndent(), messages), cascade);
     }
 }

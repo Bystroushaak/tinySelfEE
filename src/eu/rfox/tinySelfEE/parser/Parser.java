@@ -310,7 +310,9 @@ public class Parser {
                 }
 
                 if (new_obj.isSingleExpression()) {
-                    return new_obj;
+                    ASTItem out = new_obj.getFirstExpression();
+                    out.wasInParens(true);
+                    return out;
                 } else {
                     logError("Invalid syntax; multiple expressions in parens. Use (| code) syntax instead!",
                              tokens.get(obj_info.obj_start), tokens.get(obj_info.obj_end));

@@ -1,6 +1,8 @@
 package eu.rfox.tinySelfEE.parser.ast;
 
 public class Self implements ASTItem {
+    boolean was_in_parens = false;
+
     public Self() {
     }
 
@@ -21,5 +23,13 @@ public class Self implements ASTItem {
     @Override
     public String toString() {
         return "Self{}";
+    }
+
+    public boolean wasInParens() {
+        return this.was_in_parens;
+    }
+
+    public void wasInParens(boolean was_in_parens) {
+        this.was_in_parens = was_in_parens;
     }
 }

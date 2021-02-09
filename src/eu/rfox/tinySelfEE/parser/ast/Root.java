@@ -3,6 +3,7 @@ package eu.rfox.tinySelfEE.parser.ast;
 import java.util.ArrayList;
 
 public class Root implements ASTItem {
+    boolean was_in_parens = false;
     ArrayList<ASTItem> ast;
 
     Root() {
@@ -15,5 +16,13 @@ public class Root implements ASTItem {
 
     public <R> R accept(Visitor<R> visitor) {
         return visitor.visitRoot(this);
+    }
+
+    public boolean wasInParens() {
+        return this.was_in_parens;
+    }
+
+    public void wasInParens(boolean was_in_parens) {
+        this.was_in_parens = was_in_parens;
     }
 }
