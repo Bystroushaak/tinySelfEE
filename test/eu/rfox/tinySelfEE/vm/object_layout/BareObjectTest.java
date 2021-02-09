@@ -8,9 +8,7 @@ import org.junit.Test;
 
 public class BareObjectTest {
     public ObjectInterface getEmptyObject() {
-        BareObject o = new BareObject();
-
-        return o;
+        return new BareObject();
     }
 
     public ObjectInterface getObjectWithOneSlot() {
@@ -184,5 +182,24 @@ public class BareObjectTest {
         });
         assertEquals(o.slotLookup("shadowed"), PrimitiveNil.getInstance());
         assertEquals(o.slotLookup("seventh"), null);
+    }
+
+    @Test
+    public void testClone() throws SlotNotFoundException {
+        ObjectInterface o = getObjectWithScopeParentAndParents();
+
+        assertEquals(o.slotLookup("first"), PrimitiveNil.getInstance());
+        assertEquals(o.slotLookup("second"), PrimitiveNil.getInstance());
+        assertEquals(o.slotLookup("third"), PrimitiveNil.getInstance());
+        assertEquals(o.slotLookup("fourth"), PrimitiveNil.getInstance());
+        assertEquals(o.slotLookup("fifth"), null);
+
+        ObjectInterface clone = o.clone();
+
+        assertEquals(clone.slotLookup("first"), PrimitiveNil.getInstance());
+        assertEquals(clone.slotLookup("second"), PrimitiveNil.getInstance());
+        assertEquals(clone.slotLookup("third"), PrimitiveNil.getInstance());
+        assertEquals(clone.slotLookup("fourth"), PrimitiveNil.getInstance());
+        assertEquals(clone.slotLookup("fifth"), null);
     }
 }
