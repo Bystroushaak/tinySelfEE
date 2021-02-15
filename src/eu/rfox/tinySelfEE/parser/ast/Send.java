@@ -3,7 +3,6 @@ package eu.rfox.tinySelfEE.parser.ast;
 import java.util.Objects;
 
 public class Send extends SendBase implements ASTItem {
-    public ASTItem obj;
     public MessageBase message;
     private boolean default_self = false;
 

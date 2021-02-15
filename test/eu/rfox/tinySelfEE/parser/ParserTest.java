@@ -88,11 +88,11 @@ public class ParserTest {
 
     @Test
     public void parseBinaryMessage() throws TokenizerException {
-        Parser p = new Parser("1 + 2");
+        Parser p = new Parser("(1 + 2)");
         ArrayList<ASTItem> ast = p.parse();
 
-        assertEquals(ast.get(0), new NumberInt(1));
-        assertEquals(ast.get(1), new Send(new MessageBinary("+", new NumberInt(2))));
+        assertEquals(ast.get(0), new Send(new NumberInt(1),
+                                          new MessageBinary("+", new NumberInt(2))));
         assertEquals(p.hadErrors, false);
     }
 
@@ -524,7 +524,7 @@ public class ParserTest {
         assertEquals(ast.get(0), toplevel_o);
     }
 
-//    @Test
+    @Test
     public void parseMessageToToplevelObject() {
         Parser p = new Parser("(| a = 1 |) a");
         ArrayList<ASTItem> ast = p.parse();

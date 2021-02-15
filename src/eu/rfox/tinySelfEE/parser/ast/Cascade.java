@@ -4,7 +4,6 @@ import java.util.ArrayList;
 import java.util.Objects;
 
 public class Cascade extends SendBase implements ASTItem {
-    ASTItem obj;
     ArrayList<MessageBase> messages;
 
     public Cascade(ASTItem obj) {

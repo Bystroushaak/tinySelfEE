@@ -60,6 +60,17 @@ public class Parser {
 
         while (!isAtEnd()) {
             ASTItem item = parseObjectOrBlock();
+
+            // joining of the toplevel messages with objects, same as in parseCode()
+            if (!isAtEnd() && !check_next(TokenType.END_OF_EXPR) && item != null) {
+                SendBase send = parseToplevelCode();
+                if (send != null) {
+                    send.obj = item;
+                    ast.add(send);
+                    continue;
+                }
+            }
+
             if (item != null) {
                 ast.add(item);
             }
@@ -327,7 +338,7 @@ public class Parser {
     private void parseCode(Obj obj, TokenType obj_end) {
         ArrayList<ASTItem> message_sends = new ArrayList<>();
 
-        while (! check_current(obj_end)) {
+        while (!check_current(obj_end) && !isAtEnd()) {
             message_sends.add(parseObjectOrBlock());
 
             if (check_current(TokenType.END_OF_EXPR)) {
@@ -341,12 +352,39 @@ public class Parser {
             }
         }
 
-        if (! message_sends.isEmpty()) {
+        if (!message_sends.isEmpty()) {
             obj.addCode(joinMessageSends(message_sends));
         }
     }
 
-    private ASTItem parseCascade(ArrayList<ASTItem> message_sends, TokenType obj_end) {
+    /**
+     * Now, the toplevel code can contain messages, but they are not joined with the
+     * objects, so this little piece of code fixes that.
+     * @return
+     */
+    private SendBase parseToplevelCode() {
+        ArrayList<ASTItem> message_sends = new ArrayList<>();
+
+        while (!check_current(TokenType.END_OF_EXPR) && !isAtEnd()) {
+            message_sends.add(parseObjectOrBlock());
+
+            if (check_current(TokenType.END_OF_EXPR)) {
+                advance();
+                return (SendBase) joinMessageSends(message_sends);
+            } else if (check_current(TokenType.CASCADE)) {
+                advance();
+                return parseCascade(message_sends, TokenType.END_OF_EXPR);
+            }
+        }
+
+        if (!message_sends.isEmpty()) {
+            return (SendBase) joinMessageSends(message_sends);
+        }
+
+        return null;
+    }
+
+    private Cascade parseCascade(ArrayList<ASTItem> message_sends, TokenType obj_end) {
         ASTItem receiver = message_sends.remove(0);
 
         Cascade cascade = new Cascade(receiver);
@@ -355,7 +393,7 @@ public class Parser {
             cascade.addMessage(((Send) joinMessageSends(message_sends)).message);
         }
 
-        while (! check_current(obj_end, TokenType.END_OF_EXPR, TokenType.SEPARATOR)) {
+        while (!check_current(obj_end, TokenType.END_OF_EXPR, TokenType.SEPARATOR)) {
             message_sends.add(parseObjectOrBlock());
 
             if (check_current(TokenType.CASCADE)) {
