@@ -62,7 +62,7 @@ public class Parser {
             ASTItem item = parseObjectOrBlock();
 
             // joining of the toplevel messages with objects, same as in parseCode()
-            if (!isAtEnd() && !check_next(TokenType.END_OF_EXPR) && item != null) {
+            if (!isAtEnd() && !check_current(TokenType.END_OF_EXPR) && item != null) {
                 SendBase send = parseToplevelCode();
                 if (send != null) {
                     send.obj = item;
