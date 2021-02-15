@@ -508,6 +508,23 @@ public class ParserTest {
     }
 
     @Test
+    public void parseMessageToObjectInCode() {
+        Parser p = new Parser("(|| (|a = 1|) a)");
+        ArrayList<ASTItem> ast = p.parse();
+
+
+        Obj inner_obj = new Obj();
+        inner_obj.addSlot("a", new NumberInt(1));
+
+        Send result = new Send(inner_obj, new MessageUnary("a"));
+
+        Obj toplevel_o = new Obj();
+        toplevel_o.addCode(result);
+
+        assertEquals(ast.get(0), toplevel_o);
+    }
+
+//    @Test
     public void parseMessageToToplevelObject() {
         Parser p = new Parser("(| a = 1 |) a");
         ArrayList<ASTItem> ast = p.parse();
