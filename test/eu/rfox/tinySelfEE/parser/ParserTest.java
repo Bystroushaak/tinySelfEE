@@ -506,4 +506,17 @@ public class ParserTest {
 
 
     }
+
+    @Test
+    public void parseMessageToToplevelObject() {
+        Parser p = new Parser("(| a = 1 |) a");
+        ArrayList<ASTItem> ast = p.parse();
+
+        Obj o = new Obj();
+        o.addSlot("a", new NumberInt(1));
+
+        Send result = new Send(o, new MessageUnary("a"));
+
+        assertEquals(ast.get(0), result);
+    }
 }
