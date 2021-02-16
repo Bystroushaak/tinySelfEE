@@ -12,7 +12,7 @@ public class KeywordPair implements ASTItem {
     }
 
     @Override
-    public <R> R accept(Visitor<R> visitor) {
+    public <R> R accept(ASTVisitor<R> visitor) {
         return null;
     }
 

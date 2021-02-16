@@ -14,7 +14,7 @@ public class Root implements ASTItem {
         ast.add(item);
     }
 
-    public <R> R accept(Visitor<R> visitor) {
+    public <R> R accept(ASTVisitor<R> visitor) {
         return visitor.visitRoot(this);
     }
 

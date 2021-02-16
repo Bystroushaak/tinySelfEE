@@ -7,7 +7,7 @@ public class MessageUnary extends MessageBase {
         super(message_name);
     }
 
-    public <R> R accept(Visitor<R> visitor) {
+    public <R> R accept(ASTVisitor<R> visitor) {
         return visitor.visitMessageUnary(this);
     }
 

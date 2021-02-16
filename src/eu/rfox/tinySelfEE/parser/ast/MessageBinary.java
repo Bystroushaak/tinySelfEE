@@ -10,7 +10,7 @@ public class MessageBinary extends MessageBase {
         this.parameter = parameter;
     }
 
-    public <R> R accept(Visitor<R> visitor) {
+    public <R> R accept(ASTVisitor<R> visitor) {
         return visitor.visitMessageBinary(this);
     }
 

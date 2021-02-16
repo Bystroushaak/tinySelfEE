@@ -5,7 +5,7 @@ public class Nil implements ASTItem {
     public Nil() {
     }
 
-    public <R> R accept(Visitor<R> visitor) {
+    public <R> R accept(ASTVisitor<R> visitor) {
         return visitor.visitNil(this);
     }
 

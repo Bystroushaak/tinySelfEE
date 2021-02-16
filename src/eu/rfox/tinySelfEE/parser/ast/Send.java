@@ -28,7 +28,7 @@ public class Send extends SendBase implements ASTItem {
         default_self = new_state;
     }
 
-    public <R> R accept(Visitor<R> visitor) {
+    public <R> R accept(ASTVisitor<R> visitor) {
         return visitor.visitSend(this);
     }
 

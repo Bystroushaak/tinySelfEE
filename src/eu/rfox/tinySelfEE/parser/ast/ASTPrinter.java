@@ -4,7 +4,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 
-public class ASTPrinter implements Visitor<String> {
+public class ASTPrinter implements ASTVisitor<String> {
     private int indentation = 0;
 
     public String print(ASTItem expr) {

@@ -1,7 +1,7 @@
 package eu.rfox.tinySelfEE.parser.ast;
 
 public class Block extends Obj {
-    public <R> R accept(Visitor<R> visitor) {
+    public <R> R accept(ASTVisitor<R> visitor) {
         return visitor.visitBlock(this);
     }
 

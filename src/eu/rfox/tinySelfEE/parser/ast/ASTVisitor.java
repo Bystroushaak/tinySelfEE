@@ -1,6 +1,6 @@
 package eu.rfox.tinySelfEE.parser.ast;
 
-public interface Visitor<R> {
+public interface ASTVisitor<R> {
     R visitAssignmentPrimitive(AssignmentPrimitive expr);
     R visitStr(Str string);
     R visitSend(Send send);

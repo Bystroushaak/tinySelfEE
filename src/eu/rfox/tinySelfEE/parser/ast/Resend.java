@@ -21,7 +21,7 @@ public class Resend extends Send implements ASTItem {
         }
     }
 
-    public <R> R accept(Visitor<R> visitor) {
+    public <R> R accept(ASTVisitor<R> visitor) {
         return visitor.visitResend(this);
     }
 

@@ -11,7 +11,7 @@ public class NumberFloat implements ASTItem {
         this.value = value;
     }
 
-    public <R> R accept(Visitor<R> visitor) {
+    public <R> R accept(ASTVisitor<R> visitor) {
         return visitor.visitNumberFloat(this);
     }
 

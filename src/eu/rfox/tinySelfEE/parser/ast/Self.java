@@ -6,7 +6,7 @@ public class Self implements ASTItem {
     public Self() {
     }
 
-    public <R> R accept(Visitor<R> visitor) {
+    public <R> R accept(ASTVisitor<R> visitor) {
         return visitor.visitSelf(this);
     }
 

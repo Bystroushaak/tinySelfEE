@@ -98,7 +98,7 @@ public class Obj implements ASTItem {
         return code.get(0);
     }
 
-    public <R> R accept(Visitor<R> visitor) {
+    public <R> R accept(ASTVisitor<R> visitor) {
         return visitor.visitObj(this);
     }
 

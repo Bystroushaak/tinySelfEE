@@ -22,7 +22,7 @@ public abstract class MessageBase implements ASTItem {
         return parent_name;
     }
 
-    public <R> R accept(Visitor<R> visitor) {
+    public <R> R accept(ASTVisitor<R> visitor) {
         return visitor.visitMessageBase(this);
     }
 
