@@ -9,5 +9,6 @@
     <orderEntry type="inheritedJdk" />
     <orderEntry type="sourceFolder" forTests="false" />
     <orderEntry type="library" name="junit:junit:4.13" level="project" />
+    <orderEntry type="library" name="info.picocli:picocli:4.6.1" level="project" />
   </component>
 </module>
