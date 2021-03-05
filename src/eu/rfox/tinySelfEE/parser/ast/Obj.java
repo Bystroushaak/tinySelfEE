@@ -1,15 +1,17 @@
 package eu.rfox.tinySelfEE.parser.ast;
 
+import eu.rfox.tinySelfEE.vm.object_layout.ObjectRepr;
+import eu.rfox.tinySelfEE.vm.object_layout.symbolic.SymbolicCompiler;
 import eu.rfox.tinySelfEE.vm.object_layout.symbolic.SymbolicObject;
 
 import java.util.*;
 
 public class Obj implements ASTItem {
     boolean was_in_parens = false;
-    HashMap<String, ASTItem> slots;
-    ArrayList<String> arguments;
-    ArrayList<ASTItem> code;
-    HashMap<String, ASTItem> parents;
+    public HashMap<String, ASTItem> slots;
+    public ArrayList<String> arguments;
+    public ArrayList<ASTItem> code;
+    public HashMap<String, ASTItem> parents;
 
     public Obj() {
     }
@@ -132,27 +134,20 @@ public class Obj implements ASTItem {
                 '}';
     }
 
-    public SymbolicObject toSymbolicLayout(SymbolicObject scope_parent) {
+    public SymbolicObject toSymbolic() {
         SymbolicObject o = new SymbolicObject();
-        return this.toSymbolicLayout(scope_parent, o);
-    }
-
-    public SymbolicObject toSymbolicLayout(SymbolicObject scope_parent, SymbolicObject o) {
-        if (scope_parent != null) {
-            o.setScopeParent(scope_parent);
-        }
 
         if (this.slots != null) {
             for (Map.Entry<String, ASTItem> entry : slots.entrySet()) {
-                Obj ast_obj = (Obj) entry.getValue();
-                o.setSlot(entry.getKey(), ast_obj.toSymbolicLayout(o));
+                ASTItem ast_obj = entry.getValue();
+                o.setSlot(entry.getKey(), (ObjectRepr) ast_obj.toSymbolic());  // TODO: assignment primitive
             }
         }
 
         if (this.parents != null) {
             for (Map.Entry<String, ASTItem> entry : parents.entrySet()) {
                 Obj ast_parent = (Obj) entry.getValue();
-                o.setParent(entry.getKey(), ast_parent.toSymbolicLayout(null));
+                o.setParent(entry.getKey(), ast_parent.toSymbolic());
             }
         }
 
@@ -161,9 +156,9 @@ public class Obj implements ASTItem {
         }
 
         if (this.code != null) {
-            for (ASTItem message: this.code) {
-                o.addMessage(((MessageBase) message).toSymbolicMessage());
-            }
+            SymbolicCompiler compiler = new SymbolicCompiler();
+            compiler.compile(this.code);
+            o.addMessages(compiler.getCode());
         }
 
         return o;

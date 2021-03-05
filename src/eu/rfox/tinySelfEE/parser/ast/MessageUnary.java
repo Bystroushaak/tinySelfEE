@@ -1,5 +1,8 @@
 package eu.rfox.tinySelfEE.parser.ast;
 
+import eu.rfox.tinySelfEE.vm.object_layout.symbolic.SymbolicMessage;
+import eu.rfox.tinySelfEE.vm.object_layout.symbolic.SymbolicEvalProtocol;
+
 import java.util.Objects;
 
 public class MessageUnary extends MessageBase {
@@ -29,5 +32,15 @@ public class MessageUnary extends MessageBase {
         return "MessageUnary{" +
                 "message_name='" + message_name + '\'' +
                 '}';
+    }
+
+    @Override
+    public SymbolicMessage toSymbolicMessage() {
+        return new SymbolicMessage(this.message_name);
+    }
+
+    @Override
+    public SymbolicEvalProtocol toSymbolic() {
+        return null;
     }
 }

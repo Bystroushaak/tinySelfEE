@@ -1,5 +1,8 @@
 package eu.rfox.tinySelfEE.parser.ast;
 
+import eu.rfox.tinySelfEE.vm.object_layout.symbolic.SymbolicEvalProtocol;
+import eu.rfox.tinySelfEE.vm.object_layout.symbolic.SymbolicSend;
+
 import java.util.Objects;
 
 public class Send extends SendBase implements ASTItem {
@@ -52,5 +55,14 @@ public class Send extends SendBase implements ASTItem {
                 "obj=" + obj.toString() +
                 ", message=" + message.toString() +
                 '}';
+    }
+
+    @Override
+    public SymbolicEvalProtocol toSymbolic() {
+        if (this.obj.equals(new Self())) {
+            return new SymbolicSend(this.message.toSymbolicMessage());
+        }
+
+        return new SymbolicSend(this.obj.toSymbolic(), this.message.toSymbolicMessage());
     }
 }

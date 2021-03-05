@@ -1,5 +1,7 @@
 package eu.rfox.tinySelfEE.parser.ast;
 
+import eu.rfox.tinySelfEE.vm.object_layout.symbolic.SymbolicEvalProtocol;
+
 public class AssignmentPrimitive implements ASTItem {
     public <R> R accept(ASTVisitor<R> visitor) {
         return visitor.visitAssignmentPrimitive(this);
@@ -20,5 +22,9 @@ public class AssignmentPrimitive implements ASTItem {
     }
 
     public void wasInParens(boolean was_in_parens) {
+    }
+
+    public SymbolicEvalProtocol toSymbolic() {
+        return null;
     }
 }

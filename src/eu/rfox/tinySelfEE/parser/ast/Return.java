@@ -1,5 +1,8 @@
 package eu.rfox.tinySelfEE.parser.ast;
 
+import eu.rfox.tinySelfEE.vm.object_layout.symbolic.SymbolicEvalProtocol;
+import eu.rfox.tinySelfEE.vm.object_layout.symbolic.SymbolicReturn;
+
 import java.util.Objects;
 
 public class Return implements ASTItem {
@@ -40,5 +43,10 @@ public class Return implements ASTItem {
 
     public void wasInParens(boolean was_in_parens) {
         this.was_in_parens = was_in_parens;
+    }
+
+    @Override
+    public SymbolicEvalProtocol toSymbolic() {
+        return new SymbolicReturn(this.value.toSymbolic());
     }
 }

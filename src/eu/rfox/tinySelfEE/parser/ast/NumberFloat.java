@@ -1,5 +1,8 @@
 package eu.rfox.tinySelfEE.parser.ast;
 
+import eu.rfox.tinySelfEE.vm.object_layout.symbolic.SymbolicEvalProtocol;
+import eu.rfox.tinySelfEE.vm.primitives.PrimitiveFloat;
+
 import java.util.Objects;
 
 // TODO: convert to double
@@ -34,5 +37,12 @@ public class NumberFloat implements ASTItem {
 
     public void wasInParens(boolean was_in_parens) {
         this.was_in_parens = was_in_parens;
+    }
+
+    @Override
+    public SymbolicEvalProtocol toSymbolic() {
+        PrimitiveFloat float_obj = new PrimitiveFloat();
+        float_obj.setValue(this.value);
+        return float_obj;
     }
 }

@@ -1,5 +1,8 @@
 package eu.rfox.tinySelfEE.parser.ast;
 
+import eu.rfox.tinySelfEE.vm.object_layout.symbolic.SymbolicEvalProtocol;
+import eu.rfox.tinySelfEE.vm.object_layout.symbolic.SymbolicSend;
+
 import java.util.ArrayList;
 import java.util.Objects;
 
@@ -54,5 +57,23 @@ public class Cascade extends SendBase implements ASTItem {
                 "obj=" + obj.toString() +
                 ", messages=" + messages.toString() +
                 '}';
+    }
+
+    @Override
+    public SymbolicEvalProtocol toSymbolic() {
+        return null;
+    }
+
+    public ArrayList<SymbolicEvalProtocol> toSymbolicMessages() {
+        ArrayList<SymbolicEvalProtocol> messages = new ArrayList<>();
+        for (MessageBase msg : this.messages) {
+            if (this.obj.equals(new Self())) {
+                messages.add(new SymbolicSend(msg.toSymbolicMessage()));
+            } else {
+                messages.add(new SymbolicSend(this.obj.toSymbolic(), msg.toSymbolicMessage()));
+            }
+        }
+
+        return messages;
     }
 }

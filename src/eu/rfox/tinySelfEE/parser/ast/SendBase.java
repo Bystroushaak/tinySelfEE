@@ -1,7 +1,5 @@
 package eu.rfox.tinySelfEE.parser.ast;
 
-import eu.rfox.tinySelfEE.vm.object_layout.symbolic.SymbolicSend;
-
 public abstract class SendBase implements ASTItem {
     public ASTItem obj;
     boolean was_in_parens = false;
