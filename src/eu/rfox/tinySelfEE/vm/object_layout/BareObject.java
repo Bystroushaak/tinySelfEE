@@ -13,7 +13,7 @@ public class BareObject implements ObjectInterface {
 
     long id = 0;
     int version = 0;
-    CodeContext code = null;
+//    CodeContext code = null;
     boolean visited = false;
     ArrayList<String> arguments = null;
 
@@ -41,11 +41,23 @@ public class BareObject implements ObjectInterface {
         return this.visited;
     }
 
+    public boolean hasArguments() {
+        return this.arguments != null;
+    }
+
+    public boolean hasSlots() {
+        return this.slots != null;
+    }
+
     public boolean hasParents() {
         return this.parent_slots != null;
     }
 
-    public Collection<ObjectInterface> getParents() {
+    public HashMap<String, ObjectInterface> getParentSlots() {
+        return parent_slots;
+    }
+
+    public Collection<ObjectInterface> getParentObjects() {
         if (this.parent_slots == null) {
             return null;
         }
@@ -54,7 +66,8 @@ public class BareObject implements ObjectInterface {
     }
 
     public boolean hasCode() {
-        return this.code != null;
+//        return this.code != null;
+        return false;
     }
 
     public boolean hasPrimitiveCode() {
@@ -64,7 +77,7 @@ public class BareObject implements ObjectInterface {
     public ObjectInterface clone() {
         BareObject o = new BareObject();
 
-        o.code = this.code;  // TODO!
+//        o.code = this.code;  // TODO!
 
         if (this.arguments != null) {
             o.addArguments((ArrayList<String>) this.arguments.clone());
@@ -104,6 +117,10 @@ public class BareObject implements ObjectInterface {
         createSlotsIfNotExists();
         version++;
         this.slots.put(slot_name, value);
+    }
+
+    public HashMap<String, ObjectInterface> getSlots() {
+        return slots;
     }
 
     public void setSlots(HashMap<String, ObjectInterface> slots) {
@@ -218,7 +235,7 @@ public class BareObject implements ObjectInterface {
             }
 
             if (obj.hasParents()) {
-                for (ObjectInterface parent : obj.getParents()) {
+                for (ObjectInterface parent : obj.getParentObjects()) {
                     if (!parent.isVisited()) {
                         parents.add(parent);
                     }

@@ -25,7 +25,7 @@ public interface ObjectInterface {
 
     void setParent(String parent_name, ObjectInterface value);
     void setParents(HashMap<String, ObjectInterface> parents);
-    Collection<ObjectInterface> getParents();
+    Collection<ObjectInterface> getParentObjects();
 
     void addArgument(String argument_name);
     void addArguments(ArrayList<String> arguments);
