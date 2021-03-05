@@ -3,7 +3,10 @@ package eu.rfox.tinySelfEE;
 import eu.rfox.tinySelfEE.parser.Parser;
 import eu.rfox.tinySelfEE.parser.ParserException;
 import eu.rfox.tinySelfEE.parser.ast.ASTItem;
-import eu.rfox.tinySelfEE.parser.ast.ASTPrinter;
+import eu.rfox.tinySelfEE.vm.object_layout.symbolic.SymbolicCompiler;
+import eu.rfox.tinySelfEE.vm.object_layout.symbolic.SymbolicEvalProtocol;
+import eu.rfox.tinySelfEE.vm.object_layout.symbolic.SymbolicPrinter;
+import eu.rfox.tinySelfEE.vm.object_layout.symbolic.SymbolicallyVisitable;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -29,9 +32,7 @@ public class Main {
         System.exit(1);
     }
 
-    private static void runFile(String file_path) throws IOException {
-        byte[] bytes = Files.readAllBytes(Paths.get(file_path));
-        String source_code = new String(bytes, StandardCharsets.UTF_8);
+    private static ArrayList<ASTItem> parseSourceAndPrintErrors(String source_code) {
         String[] source_lines = source_code.split(System.getProperty("line.separator"));
 
         Parser parser = new Parser(source_code);
@@ -43,13 +44,32 @@ public class Main {
             }
         }
 
+        return ast;
+    }
+
+    private static void runFile(String file_path) throws IOException {
+        byte[] bytes = Files.readAllBytes(Paths.get(file_path));
+        ArrayList<ASTItem> ast = parseSourceAndPrintErrors(new String(bytes, StandardCharsets.UTF_8));
+
         for (ASTItem item : ast) {
             System.out.println(item.toString());
         }
 
-        for (ASTItem item : ast) {
-            ASTPrinter printer = new ASTPrinter();
-            System.out.println(printer.print(item));
+//        for (ASTItem item : ast) {
+//            ASTPrinter printer = new ASTPrinter();
+//            System.out.println(printer.print(item));
+//        }
+
+        SymbolicCompiler compiler = new SymbolicCompiler();
+        compiler.compile(ast);
+
+        for (SymbolicEvalProtocol item : compiler.getCode()) {
+            if (item == null) {
+                System.out.println("null;");
+            } else {
+//                System.out.println(item.toString());
+                System.out.println(new SymbolicPrinter().print((SymbolicallyVisitable) item));
+            }
         }
     }
 }
