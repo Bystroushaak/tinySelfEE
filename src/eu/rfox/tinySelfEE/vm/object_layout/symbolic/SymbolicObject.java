@@ -54,4 +54,9 @@ public class SymbolicObject extends ObjectRepr implements SymbolicEvalProtocol, 
     public String toString() {
         return objTypeForToString();
     }
+
+    @Override
+    public <R> R accept(SymbolicVisitor<R> visitor) {
+        return visitor.visitSymbolicObject(this);
+    }
 }
