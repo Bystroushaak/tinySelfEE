@@ -1,0 +1,6 @@
+(|
+    slot: parameter = (| var = 1. |
+        (parameter + 1) printString.
+        parameter + 1.
+    ).
+|) slot: 1
