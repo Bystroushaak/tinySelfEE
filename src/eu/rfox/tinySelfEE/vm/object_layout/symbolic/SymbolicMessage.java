@@ -19,6 +19,10 @@ public class SymbolicMessage implements SymbolicallyVisitable {
         return message;
     }
 
+    public boolean hasArguments() {
+        return arguments != null;
+    }
+
     public ArrayList<SymbolicEvalProtocol> getArguments() {
         return arguments;
     }

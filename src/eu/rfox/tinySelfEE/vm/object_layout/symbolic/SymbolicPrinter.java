@@ -71,7 +71,7 @@ public class SymbolicPrinter implements SymbolicVisitor<String> {
 
         result += getIndent() + "message: \"" + symbolicMessage.getMessage() + "\",\n";
 
-        if (symbolicMessage.getArguments() != null) {
+        if (symbolicMessage.hasArguments()) {
             result += getIndent() + "arguments = [\n";
 
             indentation++;
