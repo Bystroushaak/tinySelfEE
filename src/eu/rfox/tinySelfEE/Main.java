@@ -3,6 +3,7 @@ package eu.rfox.tinySelfEE;
 import eu.rfox.tinySelfEE.parser.Parser;
 import eu.rfox.tinySelfEE.parser.ParserException;
 import eu.rfox.tinySelfEE.parser.ast.ASTItem;
+import eu.rfox.tinySelfEE.parser.ast.ASTPrinter;
 import eu.rfox.tinySelfEE.vm.object_layout.symbolic.SymbolicCompiler;
 import eu.rfox.tinySelfEE.vm.object_layout.symbolic.SymbolicEvalProtocol;
 import eu.rfox.tinySelfEE.vm.object_layout.symbolic.SymbolicPrinter;
@@ -13,6 +14,7 @@ import java.util.ArrayList;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.nio.charset.StandardCharsets;
+
 
 public class Main {
     public static void main(String[] args) throws IOException {
@@ -55,11 +57,6 @@ public class Main {
             System.out.println(item.toString());
         }
 
-//        for (ASTItem item : ast) {
-//            ASTPrinter printer = new ASTPrinter();
-//            System.out.println(printer.print(item));
-//        }
-
         SymbolicCompiler compiler = new SymbolicCompiler();
         compiler.compile(ast);
 
@@ -70,6 +67,13 @@ public class Main {
 //                System.out.println(item.toString());
                 System.out.println(new SymbolicPrinter().print((SymbolicallyVisitable) item));
             }
+        }
+    }
+
+    static void printAst(ArrayList<ASTItem> ast) {
+        for (ASTItem item : ast) {
+            ASTPrinter printer = new ASTPrinter();
+            System.out.println(printer.print(item));
         }
     }
 }
