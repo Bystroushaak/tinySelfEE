@@ -22,14 +22,14 @@ public class SymbolicReturn implements SymbolicEvalProtocol, SymbolicallyVisitab
         this.obj = obj;
     }
 
+    public <R> R accept(SymbolicVisitor<R> visitor) {
+        return visitor.visitSymbolicReturn(this);
+    }
+
     public void evaluate(SymbolicObject namespace, SymbolicFrame frame) {
         if (return_type == ReturnType.SEND) {
             send.evaluate(namespace, frame);
             // TODO: ..
         }
-    }
-
-    public <R> R accept(SymbolicVisitor<R> visitor) {
-        return visitor.visitSymbolicReturn(this);
     }
 }

@@ -27,12 +27,12 @@ public class SymbolicSend implements SymbolicEvalProtocol, SymbolicallyVisitable
         return msg;
     }
 
-    public void evaluate(SymbolicObject namespace, SymbolicFrame frame) {
-
-    }
-
     @Override
     public <R> R accept(SymbolicVisitor<R> visitor) {
         return visitor.visitSymbolicSend(this);
+    }
+
+    public void evaluate(SymbolicObject namespace, SymbolicFrame frame) {
+
     }
 }
