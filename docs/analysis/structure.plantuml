@@ -1,0 +1,432 @@
+@startuml
+package eu.rfox.tinySelfEE {
+    class Main {
+    }
+    package eu.rfox.tinySelfEE.parser {
+        class ObjTokensInfo {
+        }
+        class SlotnameAndArguments {
+        }
+        class Parser {
+        }
+        class ParserException {
+        }
+        class ParserTest {
+        }
+        class ObjTokensInfoTest {
+        }
+        package eu.rfox.tinySelfEE.parser.ast {
+            class Nil {
+            }
+            class ASTVisitor {
+            }
+            class SendBase {
+            }
+            class ASTPrinter {
+            }
+            class MessageUnary {
+            }
+            class Block {
+            }
+            class MessageBinary {
+            }
+            class MessageBase {
+            }
+            class Self {
+            }
+            class Obj {
+            }
+            class Resend {
+            }
+            class KeywordPair {
+            }
+            class NumberInt {
+            }
+            class Return {
+            }
+            class MessageKeyword {
+            }
+            class Cascade {
+            }
+            class NumberFloat {
+            }
+            class AssignmentPrimitive {
+            }
+            class Send {
+            }
+            class ASTItem {
+            }
+            class Str {
+            }
+            class Root {
+            }
+        }
+    }
+    package eu.rfox.tinySelfEE.tokenizer {
+        class TokenizerException {
+        }
+        class UnexpectedTokenException {
+        }
+        class Token {
+        }
+        class UnterminatedStringException {
+        }
+        class TokenType {
+        }
+        class Tokenizer {
+        }
+        class TokenizerTest {
+        }
+    }
+    package eu.rfox.tinySelfEE.vm {
+        class CodeContext {
+        }
+        class Interpreter {
+        }
+        class SymbolicEval {
+        }
+        package eu.rfox.tinySelfEE.vm.primitives {
+            class PrimitiveInt {
+            }
+            class PrimitiveNil {
+            }
+            class PrimitiveFloat {
+            }
+            class PrimitiveStr {
+            }
+            class PrimitiveTrue {
+            }
+        }
+        package eu.rfox.tinySelfEE.vm.object_layout {
+            class ObjectRepr {
+            }
+            class SlotNotFoundException {
+            }
+            class MappedObject {
+            }
+            class BareObject {
+            }
+            class ObjectInterface {
+            }
+            class Map {
+            }
+            class BareObjectTest {
+            }
+            package eu.rfox.tinySelfEE.vm.object_layout.symbolic {
+                class SymbolicVisitor {
+                }
+                class SymbolicObject {
+                }
+                class ReturnType {
+                }
+                class SymbolicReturn {
+                }
+                class SymbolicFrame {
+                }
+                class SymbolicEvalProtocol {
+                }
+                class SymbolicallyVisitable {
+                }
+                class SymbolicSend {
+                }
+                class SymbolicResend {
+                }
+                class SymbolicBlock {
+                }
+                class SymbolicCompiler {
+                }
+                class SymbolicMessage {
+                }
+                class SymbolicPrinter {
+                }
+            }
+        }
+    }
+}
+
+
+package eu.rfox.tinySelfEE.parser {
+    class ObjTokensInfo {
+    }
+    class SlotnameAndArguments {
+    }
+    class Parser {
+    }
+    class ParserException {
+    }
+    class ParserTest {
+    }
+    class ObjTokensInfoTest {
+    }
+    package eu.rfox.tinySelfEE.parser.ast {
+        class Nil {
+        }
+        class ASTVisitor {
+        }
+        class SendBase {
+        }
+        class ASTPrinter {
+        }
+        class MessageUnary {
+        }
+        class Block {
+        }
+        class MessageBinary {
+        }
+        class MessageBase {
+        }
+        class Self {
+        }
+        class Obj {
+        }
+        class Resend {
+        }
+        class KeywordPair {
+        }
+        class NumberInt {
+        }
+        class Return {
+        }
+        class MessageKeyword {
+        }
+        class Cascade {
+        }
+        class NumberFloat {
+        }
+        class AssignmentPrimitive {
+        }
+        class Send {
+        }
+        class ASTItem {
+        }
+        class Str {
+        }
+        class Root {
+        }
+    }
+}
+
+
+package eu.rfox.tinySelfEE.parser.ast {
+    class Nil {
+    }
+    class ASTVisitor {
+    }
+    class SendBase {
+    }
+    class ASTPrinter {
+    }
+    class MessageUnary {
+    }
+    class Block {
+    }
+    class MessageBinary {
+    }
+    class MessageBase {
+    }
+    class Self {
+    }
+    class Obj {
+    }
+    class Resend {
+    }
+    class KeywordPair {
+    }
+    class NumberInt {
+    }
+    class Return {
+    }
+    class MessageKeyword {
+    }
+    class Cascade {
+    }
+    class NumberFloat {
+    }
+    class AssignmentPrimitive {
+    }
+    class Send {
+    }
+    class ASTItem {
+    }
+    class Str {
+    }
+    class Root {
+    }
+}
+
+
+package eu.rfox.tinySelfEE.tokenizer {
+    class TokenizerException {
+    }
+    class UnexpectedTokenException {
+    }
+    class Token {
+    }
+    class UnterminatedStringException {
+    }
+    class TokenType {
+    }
+    class Tokenizer {
+    }
+    class TokenizerTest {
+    }
+}
+
+
+package eu.rfox.tinySelfEE.vm {
+    class CodeContext {
+    }
+    class Interpreter {
+    }
+    class SymbolicEval {
+    }
+    package eu.rfox.tinySelfEE.vm.primitives {
+        class PrimitiveInt {
+        }
+        class PrimitiveNil {
+        }
+        class PrimitiveFloat {
+        }
+        class PrimitiveStr {
+        }
+        class PrimitiveTrue {
+        }
+    }
+    package eu.rfox.tinySelfEE.vm.object_layout {
+        class ObjectRepr {
+        }
+        class SlotNotFoundException {
+        }
+        class MappedObject {
+        }
+        class BareObject {
+        }
+        class ObjectInterface {
+        }
+        class Map {
+        }
+        class BareObjectTest {
+        }
+        package eu.rfox.tinySelfEE.vm.object_layout.symbolic {
+            class SymbolicVisitor {
+            }
+            class SymbolicObject {
+            }
+            class ReturnType {
+            }
+            class SymbolicReturn {
+            }
+            class SymbolicFrame {
+            }
+            class SymbolicEvalProtocol {
+            }
+            class SymbolicallyVisitable {
+            }
+            class SymbolicSend {
+            }
+            class SymbolicResend {
+            }
+            class SymbolicBlock {
+            }
+            class SymbolicCompiler {
+            }
+            class SymbolicMessage {
+            }
+            class SymbolicPrinter {
+            }
+        }
+    }
+}
+
+
+package eu.rfox.tinySelfEE.vm.primitives {
+    class PrimitiveInt {
+    }
+    class PrimitiveNil {
+    }
+    class PrimitiveFloat {
+    }
+    class PrimitiveStr {
+    }
+    class PrimitiveTrue {
+    }
+}
+
+
+package eu.rfox.tinySelfEE.vm.object_layout {
+    class ObjectRepr {
+    }
+    class SlotNotFoundException {
+    }
+    class MappedObject {
+    }
+    class BareObject {
+    }
+    class ObjectInterface {
+    }
+    class Map {
+    }
+    class BareObjectTest {
+    }
+    package eu.rfox.tinySelfEE.vm.object_layout.symbolic {
+        class SymbolicVisitor {
+        }
+        class SymbolicObject {
+        }
+        class ReturnType {
+        }
+        class SymbolicReturn {
+        }
+        class SymbolicFrame {
+        }
+        class SymbolicEvalProtocol {
+        }
+        class SymbolicallyVisitable {
+        }
+        class SymbolicSend {
+        }
+        class SymbolicResend {
+        }
+        class SymbolicBlock {
+        }
+        class SymbolicCompiler {
+        }
+        class SymbolicMessage {
+        }
+        class SymbolicPrinter {
+        }
+    }
+}
+
+
+package eu.rfox.tinySelfEE.vm.object_layout.symbolic {
+    class SymbolicVisitor {
+    }
+    class SymbolicObject {
+    }
+    class ReturnType {
+    }
+    class SymbolicReturn {
+    }
+    class SymbolicFrame {
+    }
+    class SymbolicEvalProtocol {
+    }
+    class SymbolicallyVisitable {
+    }
+    class SymbolicSend {
+    }
+    class SymbolicResend {
+    }
+    class SymbolicBlock {
+    }
+    class SymbolicCompiler {
+    }
+    class SymbolicMessage {
+    }
+    class SymbolicPrinter {
+    }
+}
+
+
+@enduml
