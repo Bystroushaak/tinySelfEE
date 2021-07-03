@@ -1,7 +1,5 @@
 package eu.rfox.tinySelfEE.parser.ast;
 
-import eu.rfox.tinySelfEE.vm.object_layout.symbolic.SymbolicEvalProtocol;
-
 public class KeywordPair implements ASTItem {
     boolean was_in_parens = false;
 
@@ -24,10 +22,5 @@ public class KeywordPair implements ASTItem {
 
     public void wasInParens(boolean was_in_parens) {
         this.was_in_parens = was_in_parens;
-    }
-
-    @Override
-    public SymbolicEvalProtocol toSymbolic() {  // not used, this object is only used during parsing
-        return null;
     }
 }

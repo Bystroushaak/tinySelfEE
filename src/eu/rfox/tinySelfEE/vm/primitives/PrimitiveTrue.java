@@ -1,10 +1,9 @@
 package eu.rfox.tinySelfEE.vm.primitives;
 
 import eu.rfox.tinySelfEE.vm.object_layout.ObjectRepr;
-import eu.rfox.tinySelfEE.vm.object_layout.symbolic.SymbolicVisitor;
-import eu.rfox.tinySelfEE.vm.object_layout.symbolic.SymbolicallyVisitable;
 
-public class PrimitiveTrue extends ObjectRepr implements SymbolicallyVisitable {
+
+public class PrimitiveTrue extends ObjectRepr {
     private static PrimitiveTrue instance = null;
 
     private PrimitiveTrue() {
@@ -17,10 +16,6 @@ public class PrimitiveTrue extends ObjectRepr implements SymbolicallyVisitable {
         }
 
         return instance;
-    }
-
-    public <R> R accept(SymbolicVisitor<R> visitor) {
-        return visitor.visitPrimitiveTrue(this);
     }
 
     public String toString() {

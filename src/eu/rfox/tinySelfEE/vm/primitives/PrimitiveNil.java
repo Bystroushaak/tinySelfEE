@@ -1,10 +1,8 @@
 package eu.rfox.tinySelfEE.vm.primitives;
 
 import eu.rfox.tinySelfEE.vm.object_layout.ObjectRepr;
-import eu.rfox.tinySelfEE.vm.object_layout.symbolic.SymbolicVisitor;
-import eu.rfox.tinySelfEE.vm.object_layout.symbolic.SymbolicallyVisitable;
 
-public class PrimitiveNil extends ObjectRepr implements SymbolicallyVisitable {
+public class PrimitiveNil extends ObjectRepr {
     private static PrimitiveNil instance = null;
 
     private PrimitiveNil() {
@@ -21,9 +19,5 @@ public class PrimitiveNil extends ObjectRepr implements SymbolicallyVisitable {
 
     public String toString() {
         return "nil";
-    }
-
-    public <R> R accept(SymbolicVisitor<R> visitor) {
-        return visitor.visitPrimitiveNil(this);
     }
 }

@@ -1,7 +1,5 @@
 package eu.rfox.tinySelfEE.parser.ast;
 
-import eu.rfox.tinySelfEE.vm.object_layout.symbolic.SymbolicEvalProtocol;
-
 public class Self implements ASTItem {
     boolean was_in_parens = false;
 
@@ -33,10 +31,5 @@ public class Self implements ASTItem {
 
     public void wasInParens(boolean was_in_parens) {
         this.was_in_parens = was_in_parens;
-    }
-
-    @Override
-    public SymbolicEvalProtocol toSymbolic() {
-        return null;
     }
 }

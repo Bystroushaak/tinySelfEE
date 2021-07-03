@@ -1,9 +1,5 @@
 package eu.rfox.tinySelfEE.parser.ast;
 
-import eu.rfox.tinySelfEE.vm.object_layout.ObjectRepr;
-import eu.rfox.tinySelfEE.vm.object_layout.symbolic.SymbolicCompiler;
-import eu.rfox.tinySelfEE.vm.object_layout.symbolic.SymbolicObject;
-
 import java.util.*;
 
 public class Obj implements ASTItem {
@@ -132,36 +128,6 @@ public class Obj implements ASTItem {
                 ", arguments=" + arguments +
                 ", code=" + code +
                 '}';
-    }
-
-    public SymbolicObject toSymbolic() {
-        SymbolicObject o = new SymbolicObject();
-
-        if (this.slots != null) {
-            for (Map.Entry<String, ASTItem> entry : slots.entrySet()) {
-                ASTItem ast_obj = entry.getValue();
-                o.setSlot(entry.getKey(), (ObjectRepr) ast_obj.toSymbolic());  // TODO: assignment primitive
-            }
-        }
-
-        if (this.parents != null) {
-            for (Map.Entry<String, ASTItem> entry : parents.entrySet()) {
-                Obj ast_parent = (Obj) entry.getValue();
-                o.setParent(entry.getKey(), ast_parent.toSymbolic());
-            }
-        }
-
-        if (this.arguments != null) {
-            o.addArguments(this.arguments);
-        }
-
-        if (this.code != null) {
-            SymbolicCompiler compiler = new SymbolicCompiler();
-            compiler.compile(this.code);
-            o.addMessages(compiler.getCode());
-        }
-
-        return o;
     }
 
     public boolean wasInParens() {

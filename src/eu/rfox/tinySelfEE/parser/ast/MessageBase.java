@@ -1,7 +1,5 @@
 package eu.rfox.tinySelfEE.parser.ast;
 
-import eu.rfox.tinySelfEE.vm.object_layout.symbolic.SymbolicMessage;
-
 public abstract class MessageBase implements ASTItem {
     boolean was_in_parens = false;
     String message_name;
@@ -33,6 +31,4 @@ public abstract class MessageBase implements ASTItem {
     public void wasInParens(boolean was_in_parens) {
         this.was_in_parens = was_in_parens;
     }
-
-    public abstract SymbolicMessage toSymbolicMessage();
 }

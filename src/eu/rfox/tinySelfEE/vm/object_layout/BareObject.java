@@ -1,13 +1,16 @@
 package eu.rfox.tinySelfEE.vm.object_layout;
 
-import eu.rfox.tinySelfEE.vm.CodeContext;
-
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
 
 
+/**
+ * Implementation of the most simple object, without any caching, or any other implementation.
+ *
+ * This will be slow, but good for debugging.
+ */
 public class BareObject implements ObjectInterface {
     static long id_counter = 0;
 

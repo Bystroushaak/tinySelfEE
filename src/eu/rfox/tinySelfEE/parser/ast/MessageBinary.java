@@ -1,9 +1,5 @@
 package eu.rfox.tinySelfEE.parser.ast;
 
-import eu.rfox.tinySelfEE.vm.object_layout.symbolic.SymbolicMessage;
-import eu.rfox.tinySelfEE.vm.object_layout.symbolic.SymbolicEvalProtocol;
-
-import java.util.ArrayList;
 import java.util.Objects;
 
 public class MessageBinary extends MessageBase {
@@ -38,17 +34,5 @@ public class MessageBinary extends MessageBase {
                 "message_name='" + message_name + '\'' +
                 ", parameter=" + parameter.toString() +
                 '}';
-    }
-
-    @Override
-    public SymbolicMessage toSymbolicMessage() {
-        ArrayList<SymbolicEvalProtocol> arguments = new ArrayList<>();
-        arguments.add(this.parameter.toSymbolic());
-        return new SymbolicMessage(message_name, arguments);
-    }
-
-    @Override
-    public SymbolicEvalProtocol toSymbolic() {
-        return null;
     }
 }

@@ -1,16 +1,16 @@
-package eu.rfox.tinySelfEE.vm.object_layout.symbolic;
+package eu.rfox.tinySelfEE.vm;
 
 import eu.rfox.tinySelfEE.vm.object_layout.ObjectRepr;
 
 import java.util.ArrayList;
 
-public class SymbolicFrame {
+public class Frame {
     int pointer = -1;
     ArrayList<ObjectRepr> obj_stack;
     ObjectRepr self;
     boolean has_self = false;
 
-    public SymbolicFrame() {
+    public Frame() {
         obj_stack = new ArrayList<>();
     }
 
@@ -37,7 +37,7 @@ public class SymbolicFrame {
     }
 
     public String toString() {
-        String out = "SymbolicFrame(\n";
+        String out = "Frame(\n";
         out += "    depth: " + String.valueOf(pointer) + ",\n";
 
         out += "    self: ";

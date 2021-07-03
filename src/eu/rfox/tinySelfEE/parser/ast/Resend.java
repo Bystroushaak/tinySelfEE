@@ -1,7 +1,5 @@
 package eu.rfox.tinySelfEE.parser.ast;
 
-import eu.rfox.tinySelfEE.vm.object_layout.symbolic.SymbolicEvalProtocol;
-
 import java.util.Objects;
 
 public class Resend extends Send implements ASTItem {
@@ -48,10 +46,5 @@ public class Resend extends Send implements ASTItem {
     @Override
     public int hashCode() {
         return Objects.hash(super.hashCode(), parent_name);
-    }
-
-    @Override
-    public SymbolicEvalProtocol toSymbolic() {
-        return null;
     }
 }
