@@ -1,7 +1,10 @@
 package eu.rfox.tinySelfEE.vm.object_layout.symbolic;
 
+import eu.rfox.tinySelfEE.vm.object_layout.ObjectRepr;
+import eu.rfox.tinySelfEE.vm.object_layout.SlotNotFoundException;
+
 public class SymbolicSend implements SymbolicEvalProtocol, SymbolicallyVisitable {
-    boolean send_to_self = false;
+    boolean send_to_self = true;
     SymbolicEvalProtocol receiver;
     SymbolicMessage msg;
 
@@ -11,7 +14,7 @@ public class SymbolicSend implements SymbolicEvalProtocol, SymbolicallyVisitable
 
     public SymbolicSend(SymbolicEvalProtocol receiver, SymbolicMessage msg) {
         this.receiver = receiver;
-        this.send_to_self = true;
+        this.send_to_self = false;
         this.msg = msg;
     }
 
@@ -33,6 +36,25 @@ public class SymbolicSend implements SymbolicEvalProtocol, SymbolicallyVisitable
     }
 
     public void evaluate(SymbolicObject namespace, SymbolicFrame frame) {
+        if (send_to_self) {
+            frame.pushSelf();
+        } else {
+            receiver.evaluate(namespace, frame);
+        }
+
+        ObjectRepr top_obj = frame.pop();
+
+        ObjectRepr slot;
+        try {
+            slot = (ObjectRepr) top_obj.slotLookup(msg.getMessage());
+        } catch (SlotNotFoundException e) {
+            e.printStackTrace();
+            return;
+        }
+
+        if (slot.hasCode()) {
+
+        }
 
     }
 }

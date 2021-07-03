@@ -4,10 +4,7 @@ import eu.rfox.tinySelfEE.parser.Parser;
 import eu.rfox.tinySelfEE.parser.ParserException;
 import eu.rfox.tinySelfEE.parser.ast.ASTItem;
 import eu.rfox.tinySelfEE.parser.ast.ASTPrinter;
-import eu.rfox.tinySelfEE.vm.object_layout.symbolic.SymbolicCompiler;
-import eu.rfox.tinySelfEE.vm.object_layout.symbolic.SymbolicEvalProtocol;
-import eu.rfox.tinySelfEE.vm.object_layout.symbolic.SymbolicPrinter;
-import eu.rfox.tinySelfEE.vm.object_layout.symbolic.SymbolicallyVisitable;
+import eu.rfox.tinySelfEE.vm.object_layout.symbolic.*;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -53,27 +50,45 @@ public class Main {
         byte[] bytes = Files.readAllBytes(Paths.get(file_path));
         ArrayList<ASTItem> ast = parseSourceAndPrintErrors(new String(bytes, StandardCharsets.UTF_8));
 
-        for (ASTItem item : ast) {
-            System.out.println(item.toString());
-        }
+        printRawAst(ast);
 
         SymbolicCompiler compiler = new SymbolicCompiler();
         compiler.compile(ast);
+        ArrayList<SymbolicEvalProtocol> symbolic_code = compiler.getCode();
+        printSymbolicRepresentation(symbolic_code);
 
-        for (SymbolicEvalProtocol item : compiler.getCode()) {
-            if (item == null) {
-                System.out.println("null;");
-            } else {
-//                System.out.println(item.toString());
-                System.out.println(new SymbolicPrinter().print((SymbolicallyVisitable) item));
-            }
+        System.out.println("---");
+        System.out.println("Symbolic evaluation time:\n");
+
+        SymbolicObject namespace = new SymbolicObject();
+        SymbolicFrame frame = new SymbolicFrame();
+        for (SymbolicEvalProtocol item : symbolic_code) {
+            item.evaluate(namespace, frame);
+        }
+
+        System.out.println("---");
+        System.out.println("Frames:\n");
+        System.out.println(frame.toString());
+    }
+
+    private static void printRawAst(ArrayList<ASTItem> ast) {
+        for (ASTItem item : ast) {
+            System.out.println(item.toString());
         }
     }
 
-    static void printAst(ArrayList<ASTItem> ast) {
+    private static void printAst(ArrayList<ASTItem> ast) {
         for (ASTItem item : ast) {
             ASTPrinter printer = new ASTPrinter();
             System.out.println(printer.print(item));
+        }
+    }
+
+    static void printSymbolicRepresentation(ArrayList<SymbolicEvalProtocol> symbolic_structure) {
+        for (SymbolicEvalProtocol item : symbolic_structure) {
+            if (item != null) {
+                System.out.println(new SymbolicPrinter().print((SymbolicallyVisitable) item));
+            }
         }
     }
 }

@@ -13,6 +13,6 @@ import eu.rfox.tinySelfEE.vm.object_layout.symbolic.SymbolicEvalProtocol;
 public class ObjectRepr extends BareObject implements SymbolicEvalProtocol {
     @Override
     public void evaluate(SymbolicObject namespace, SymbolicFrame frame) {
-        frame.pushObject(this);
+        frame.push(this);
     }
 }
