@@ -1,5 +1,7 @@
 package eu.rfox.tinySelfEE.parser.ast;
 
+import eu.rfox.tinySelfEE.vm.CodeContext;
+
 import java.util.Objects;
 
 public class MessageUnary extends MessageBase {
@@ -29,5 +31,11 @@ public class MessageUnary extends MessageBase {
         return "MessageUnary{" +
                 "message_name='" + message_name + '\'' +
                 '}';
+    }
+
+    @Override
+    public CodeContext compile(CodeContext context) {
+        context.addUnaryMessageSendBytecode(message_name);
+        return context;
     }
 }

@@ -1,5 +1,7 @@
 package eu.rfox.tinySelfEE.parser.ast;
 
+import eu.rfox.tinySelfEE.vm.CodeContext;
+
 import java.util.Objects;
 
 public class Resend extends Send implements ASTItem {
@@ -46,5 +48,13 @@ public class Resend extends Send implements ASTItem {
     @Override
     public int hashCode() {
         return Objects.hash(super.hashCode(), parent_name);
+    }
+
+    @Override
+    public CodeContext compile(CodeContext context) {
+        obj.compile(context);
+        context.addPushParentBytecode(parent_name);
+        message.compile(context);
+        return context;
     }
 }

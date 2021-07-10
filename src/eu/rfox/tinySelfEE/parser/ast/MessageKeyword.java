@@ -1,5 +1,7 @@
 package eu.rfox.tinySelfEE.parser.ast;
 
+import eu.rfox.tinySelfEE.vm.CodeContext;
+
 import java.util.ArrayList;
 import java.util.Objects;
 
@@ -49,5 +51,14 @@ public class MessageKeyword extends MessageBase {
                 "message_name='" + message_name + '\'' +
                 ", parameter=" + parameters.toString() +
                 '}';
+    }
+
+    @Override
+    public CodeContext compile(CodeContext context) {
+        for (ASTItem parameter: parameters) {
+            parameter.compile(context);
+        }
+        context.addKeywordMessageSendBytecode(message_name, parameters.size());
+        return context;
     }
 }

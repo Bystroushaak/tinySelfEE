@@ -1,5 +1,7 @@
 package eu.rfox.tinySelfEE.parser.ast;
 
+import eu.rfox.tinySelfEE.vm.CodeContext;
+
 import java.util.ArrayList;
 import java.util.Objects;
 
@@ -54,5 +56,14 @@ public class Cascade extends SendBase implements ASTItem {
                 "obj=" + obj.toString() +
                 ", messages=" + messages.toString() +
                 '}';
+    }
+
+    @Override
+    public CodeContext compile(CodeContext context) {
+        for (MessageBase message : messages) {
+            obj.compile(context);
+            message.compile(context);
+        }
+        return context;
     }
 }

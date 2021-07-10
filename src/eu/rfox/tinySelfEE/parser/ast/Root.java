@@ -1,17 +1,26 @@
 package eu.rfox.tinySelfEE.parser.ast;
 
+import eu.rfox.tinySelfEE.vm.CodeContext;
+
 import java.util.ArrayList;
 
 public class Root implements ASTItem {
     boolean was_in_parens = false;
-    ArrayList<ASTItem> ast;
+    public ArrayList<ASTItem> ast;
 
-    Root() {
-        ast = new ArrayList<ASTItem>();
+    public Root() {
+        ast = new ArrayList<>();
     }
 
-    Root(ASTItem item) {
+    public Root(ASTItem item) {
+        if (ast == null) {
+            ast = new ArrayList<>();
+        }
         ast.add(item);
+    }
+
+    public Root(ArrayList<ASTItem> ast) {
+        this.ast = ast;
     }
 
     public <R> R accept(ASTVisitor<R> visitor) {
@@ -24,5 +33,14 @@ public class Root implements ASTItem {
 
     public void wasInParens(boolean was_in_parens) {
         this.was_in_parens = was_in_parens;
+    }
+
+    @Override
+    public CodeContext compile(CodeContext context) {
+        for (ASTItem item : ast) {
+            item.compile(context);
+        }
+
+        return context;
     }
 }

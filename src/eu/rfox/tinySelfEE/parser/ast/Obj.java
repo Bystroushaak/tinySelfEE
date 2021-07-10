@@ -1,5 +1,8 @@
 package eu.rfox.tinySelfEE.parser.ast;
 
+import eu.rfox.tinySelfEE.vm.CodeContext;
+import eu.rfox.tinySelfEE.vm.object_layout.ObjectRepr;
+
 import java.util.*;
 
 public class Obj implements ASTItem {
@@ -136,5 +139,66 @@ public class Obj implements ASTItem {
 
     public void wasInParens(boolean was_in_parens) {
         this.was_in_parens = was_in_parens;
+    }
+
+    // Used in Block to be able to use same compilation method
+    ObjectRepr getOjbForCompilation() {
+        return new ObjectRepr();
+    }
+
+    // Used in Block to be able to use same compilation method
+    void addLiteral(CodeContext context, ObjectRepr obj) {
+        context.addObjectLiteralAndBytecode(obj);
+    }
+
+    @Override
+    public CodeContext compile(CodeContext context) {
+        ObjectRepr obj = getOjbForCompilation();
+
+        if (arguments != null) {
+            String[] arguments_array = new String[arguments.size()];
+            arguments.toArray(arguments_array);
+            obj.setArguments(arguments_array);
+        }
+
+        addLiteral(context, obj);
+
+        boolean will_have_slots = false;
+
+        if (slots != null) {
+            for (Map.Entry<String, ASTItem> entry : slots.entrySet()) {
+                String slot_name = entry.getKey();
+                ASTItem slot_item = entry.getValue();
+
+                slot_item.compile(context);
+                context.addSlotBytecode(slot_name);
+
+                will_have_slots = true;
+            }
+        }
+
+        if (parents != null) {
+            for (Map.Entry<String, ASTItem> entry : parents.entrySet()) {
+                String parent_name = entry.getKey();
+                ASTItem parent_item = entry.getValue();
+
+                parent_item.compile(context);
+                context.addParentBytecode(parent_name);
+            }
+        }
+
+        if (code != null) {
+            CodeContext new_context = new CodeContext();
+            obj.code = new_context;
+            new_context.will_have_slots = will_have_slots;
+
+            for (ASTItem item : code) {
+                item.compile(new_context);
+            }
+
+            new_context.addReturnTopBytecode();
+        }
+
+        return context;
     }
 }

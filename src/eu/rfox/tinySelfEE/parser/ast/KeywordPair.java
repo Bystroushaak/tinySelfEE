@@ -1,5 +1,7 @@
 package eu.rfox.tinySelfEE.parser.ast;
 
+import eu.rfox.tinySelfEE.vm.CodeContext;
+
 public class KeywordPair implements ASTItem {
     boolean was_in_parens = false;
 
@@ -22,5 +24,10 @@ public class KeywordPair implements ASTItem {
 
     public void wasInParens(boolean was_in_parens) {
         this.was_in_parens = was_in_parens;
+    }
+
+    @Override
+    public CodeContext compile(CodeContext context) {
+        return context;
     }
 }

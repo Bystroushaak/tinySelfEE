@@ -1,5 +1,7 @@
 package eu.rfox.tinySelfEE.parser.ast;
 
+import eu.rfox.tinySelfEE.vm.CodeContext;
+
 import java.util.Objects;
 
 public class Send extends SendBase implements ASTItem {
@@ -52,5 +54,12 @@ public class Send extends SendBase implements ASTItem {
                 "obj=" + obj.toString() +
                 ", message=" + message.toString() +
                 '}';
+    }
+
+    @Override
+    public CodeContext compile(CodeContext context) {
+        obj.compile(context);
+        message.compile(context);
+        return context;
     }
 }

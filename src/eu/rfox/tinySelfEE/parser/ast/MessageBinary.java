@@ -1,5 +1,7 @@
 package eu.rfox.tinySelfEE.parser.ast;
 
+import eu.rfox.tinySelfEE.vm.CodeContext;
+
 import java.util.Objects;
 
 public class MessageBinary extends MessageBase {
@@ -34,5 +36,12 @@ public class MessageBinary extends MessageBase {
                 "message_name='" + message_name + '\'' +
                 ", parameter=" + parameter.toString() +
                 '}';
+    }
+
+    @Override
+    public CodeContext compile(CodeContext context) {
+        parameter.compile(context);
+        context.addBinaryMessageSendBytecode(message_name);
+        return context;
     }
 }

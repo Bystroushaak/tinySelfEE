@@ -1,5 +1,6 @@
 package eu.rfox.tinySelfEE.parser.ast;
 
+import eu.rfox.tinySelfEE.vm.CodeContext;
 import eu.rfox.tinySelfEE.vm.primitives.PrimitiveInt;
 
 import java.util.Objects;
@@ -40,5 +41,11 @@ public class NumberInt implements ASTItem {
 
     public void wasInParens(boolean was_in_parens) {
         this.was_in_parens = was_in_parens;
+    }
+
+    @Override
+    public CodeContext compile(CodeContext context) {
+        context.addIntLiteralAndBytecode(value);
+        return context;
     }
 }

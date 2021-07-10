@@ -1,6 +1,6 @@
 package eu.rfox.tinySelfEE.parser.ast;
 
-import eu.rfox.tinySelfEE.vm.primitives.PrimitiveFloat;
+import eu.rfox.tinySelfEE.vm.CodeContext;
 
 import java.util.Objects;
 
@@ -36,5 +36,11 @@ public class NumberFloat implements ASTItem {
 
     public void wasInParens(boolean was_in_parens) {
         this.was_in_parens = was_in_parens;
+    }
+
+    @Override
+    public CodeContext compile(CodeContext context) {
+        context.addFloatLiteralAndBytecode(value);
+        return context;
     }
 }
