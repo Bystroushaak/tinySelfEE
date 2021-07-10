@@ -16,6 +16,12 @@ public class Return implements ASTItem {
         return visitor.visitReturn(this);
     }
 
+    public ReturnBlock toReturnBlock() {
+        ReturnBlock rb = new ReturnBlock(value);
+        rb.wasInParens(wasInParens());
+        return rb;
+    }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
