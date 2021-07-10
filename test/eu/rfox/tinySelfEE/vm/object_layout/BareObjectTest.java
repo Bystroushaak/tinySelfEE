@@ -2,6 +2,7 @@ package eu.rfox.tinySelfEE.vm.object_layout;
 
 import static org.junit.Assert.*;
 
+import eu.rfox.tinySelfEE.vm.object_layout.obj_bare.BareObject;
 import eu.rfox.tinySelfEE.vm.primitives.PrimitiveNil;
 import eu.rfox.tinySelfEE.vm.primitives.PrimitiveTrue;
 import org.junit.Test;
