@@ -1,4 +1,4 @@
-package eu.rfox.tinySelfEE.vm.object_layout;
+package eu.rfox.tinySelfEE.vm.object_layout.obj_mapped;
 
 import java.security.KeyException;
 import java.util.ArrayList;

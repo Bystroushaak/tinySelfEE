@@ -1,4 +1,4 @@
-package eu.rfox.tinySelfEE.vm.object_layout;
+package eu.rfox.tinySelfEE.vm.object_layout.obj_mapped;
 
 import java.util.ArrayList;
 import java.util.LinkedHashMap;

@@ -1,4 +1,8 @@
-package eu.rfox.tinySelfEE.vm.object_layout;
+package eu.rfox.tinySelfEE.vm.object_layout.obj_bare;
+
+import eu.rfox.tinySelfEE.vm.CodeContext;
+import eu.rfox.tinySelfEE.vm.object_layout.ObjectInterface;
+import eu.rfox.tinySelfEE.vm.object_layout.SlotNotFoundException;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -16,9 +20,11 @@ public class BareObject implements ObjectInterface {
 
     long id = 0;
     int version = 0;
-//    CodeContext code = null;
+
     boolean visited = false;
-    ArrayList<String> arguments = null;
+
+    public CodeContext code = null;
+    String[] arguments = null;
 
     ObjectInterface scope_parent = null;
     HashMap<String, ObjectInterface> slots = null;
@@ -69,21 +75,18 @@ public class BareObject implements ObjectInterface {
     }
 
     public boolean hasCode() {
-//        return this.code != null;
-        return false;
+        return this.code != null;
     }
 
     public boolean hasPrimitiveCode() {
         return false;
     }
 
-    public ObjectInterface clone() {
-        BareObject o = new BareObject();
-
-//        o.code = this.code;  // TODO!
+    public ObjectInterface clone(BareObject o) {
+        o.code = this.code;
 
         if (this.arguments != null) {
-            o.addArguments((ArrayList<String>) this.arguments.clone());
+            o.setArguments(this.arguments);
         }
         o.setScopeParent(this.scope_parent);
 
@@ -98,6 +101,11 @@ public class BareObject implements ObjectInterface {
         return o;
     }
 
+    public ObjectInterface clone() {
+        BareObject o = new BareObject();
+        return this.clone(o);
+    }
+
     private void createSlotsIfNotExists() {
         if (this.slots == null) {
             this.slots = new LinkedHashMap<>();
@@ -107,12 +115,6 @@ public class BareObject implements ObjectInterface {
     private void createParentSlotsIfNotExists() {
         if (this.parent_slots == null) {
             this.parent_slots = new LinkedHashMap<>();
-        }
-    }
-
-    private void createArgumentsIfNotExists() {
-        if (this.arguments == null) {
-            this.arguments = new ArrayList<>();
         }
     }
 
@@ -150,21 +152,11 @@ public class BareObject implements ObjectInterface {
         return this.scope_parent;
     }
 
-    public void addArgument(String argument_name) {
-        createArgumentsIfNotExists();
-        arguments.add(argument_name);
+    public void setArguments(String[] arguments) {
+        this.arguments = arguments;
     }
 
-    public void addArguments(ArrayList<String> arguments) {
-        if (this.arguments == null) {
-            this.arguments = arguments;
-            return;
-        }
-
-        this.arguments.addAll(arguments);
-    }
-
-    public ArrayList<String> getArguments() {
+    public String[] getArguments() {
         return this.arguments;
     }
 
