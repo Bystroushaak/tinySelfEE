@@ -4,6 +4,8 @@ import eu.rfox.tinySelfEE.parser.Parser;
 import eu.rfox.tinySelfEE.parser.ParserException;
 import eu.rfox.tinySelfEE.parser.ast.ASTItem;
 import eu.rfox.tinySelfEE.parser.ast.ASTPrinter;
+import eu.rfox.tinySelfEE.parser.ast.Root;
+import eu.rfox.tinySelfEE.vm.CodeContext;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -30,7 +32,7 @@ public class Main {
         System.exit(1);
     }
 
-    private static ArrayList<ASTItem> parseSourceAndPrintErrors(String source_code) {
+    private static Root parseSourceAndPrintErrors(String source_code) {
         String[] source_lines = source_code.split(System.getProperty("line.separator"));
 
         Parser parser = new Parser(source_code);
@@ -42,24 +44,27 @@ public class Main {
             }
         }
 
-        return ast;
+        return new Root(ast);
     }
 
     private static void runFile(String file_path) throws IOException {
         byte[] bytes = Files.readAllBytes(Paths.get(file_path));
-        ArrayList<ASTItem> ast = parseSourceAndPrintErrors(new String(bytes, StandardCharsets.UTF_8));
+        Root ast_root = parseSourceAndPrintErrors(new String(bytes, StandardCharsets.UTF_8));
 
-        printRawAst(ast);
+        printRawAst(ast_root);
+
+        CodeContext root_context = new CodeContext();
+        ast_root.compile(root_context);
     }
 
-    private static void printRawAst(ArrayList<ASTItem> ast) {
-        for (ASTItem item : ast) {
+    private static void printRawAst(Root ast_root) {
+        for (ASTItem item : ast_root.ast) {
             System.out.println(item.toString());
         }
     }
 
-    private static void printAst(ArrayList<ASTItem> ast) {
-        for (ASTItem item : ast) {
+    private static void printAst(Root ast_root) {
+        for (ASTItem item : ast_root.ast) {
             ASTPrinter printer = new ASTPrinter();
             System.out.println(printer.print(item));
         }
