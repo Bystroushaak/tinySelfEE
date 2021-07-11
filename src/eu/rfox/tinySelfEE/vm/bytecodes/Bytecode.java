@@ -26,7 +26,7 @@ package eu.rfox.tinySelfEE.vm.bytecodes;
         Run new code.
     PUSH_SELF, NOP, NOP
         Push self on top of the stack.
-    PUSH_PARENT, NOP, <str index>
+    PUSH_PARENT, <str index>, NOP
         Take object from the top of the stack.
         Find parent named <str index> in the object.
         Push that object on top of the stack.

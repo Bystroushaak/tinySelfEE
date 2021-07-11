@@ -41,8 +41,14 @@ public class CodeContext {
     private ArrayList<ObjectRepr> literals_obj;
     private ArrayList<ObjectRepr> literals_block;
 
-    public void addInstruction(Instruction instruction) {
+    private ArrayList<Instruction> instructions;
 
+    public CodeContext() {
+        instructions = new ArrayList<>();
+    }
+
+    public void addInstruction(Instruction instruction) {
+        instructions.add(instruction);
     }
 
     // Strings /////////////////////////////////////////////////////////////////////////////////////////////////////////
