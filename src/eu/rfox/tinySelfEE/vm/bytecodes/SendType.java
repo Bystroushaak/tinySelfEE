@@ -1,4 +1,4 @@
-package eu.rfox.tinySelfEE.vm;
+package eu.rfox.tinySelfEE.vm.bytecodes;
 
 public enum SendType {
     UNARY(0),
