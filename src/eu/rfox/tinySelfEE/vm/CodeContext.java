@@ -1,66 +1,29 @@
 package eu.rfox.tinySelfEE.vm;
 
 import eu.rfox.tinySelfEE.vm.bytecodes.Bytecode;
-import eu.rfox.tinySelfEE.vm.bytecodes.LiteralType;
-import eu.rfox.tinySelfEE.vm.bytecodes.SendType;
-import eu.rfox.tinySelfEE.vm.bytecodes.SlotType;
 import eu.rfox.tinySelfEE.vm.object_layout.ObjectRepr;
 
 import java.util.ArrayList;
 
 class Instruction {
     public int bytecode = 0;
-    public int type = 0;
     public int index = 0;
-    public int number_of_arguments = 0;
+    public int number_of_arguments = Bytecode.NOP.value;
 
     Instruction(Bytecode bytecode) {
         this.bytecode = bytecode.value;
     }
 
-    Instruction(Bytecode bytecode, LiteralType type) {
+    Instruction(Bytecode bytecode, int index) {
         this.bytecode = bytecode.value;
-        this.type = type.value;
-    }
-
-    Instruction(Bytecode bytecode, LiteralType type, int index) {
-        this.bytecode = bytecode.value;
-        this.type = type.value;
         this.index = index;
     }
 
-    Instruction(Bytecode bytecode, SendType type, int index) {
+    Instruction(Bytecode bytecode, int index, int number_of_arguments) {
         this.bytecode = bytecode.value;
-        this.type = type.value;
-        this.index = index;
-    }
-
-    Instruction(Bytecode bytecode, SlotType type, int index) {
-        this.bytecode = bytecode.value;
-        this.type = type.value;
-        this.index = index;
-    }
-
-    Instruction(Bytecode bytecode, Bytecode type, int index) {
-        this.bytecode = bytecode.value;
-        this.type = type.value;
-        this.index = index;
-    }
-
-    Instruction(Bytecode bytecode, int type, int index, int number_of_arguments) {
-        this.bytecode = bytecode.value;
-        this.type = type;
         this.index = index;
         this.number_of_arguments = number_of_arguments;
     }
-
-    Instruction(Bytecode bytecode, SendType type, int index, int number_of_arguments) {
-        this.bytecode = bytecode.value;
-        this.type = type.value;
-        this.index = index;
-        this.number_of_arguments = number_of_arguments;
-    }
-
 }
 
 public class CodeContext {
@@ -146,36 +109,36 @@ public class CodeContext {
 
     // Add literal & bytecode section //////////////////////////////////////////////////////////////////////////////////
     public void addNilLiteralBytecode() {
-        addInstruction(new Instruction(Bytecode.PUSH_LITERAL, LiteralType.NIL));
+        addInstruction(new Instruction(Bytecode.PUSH_LITERAL_NIL));
     }
 
     public void addAssingmentLiteralBytecode() {
-        addInstruction(new Instruction(Bytecode.PUSH_LITERAL, LiteralType.ASSIGNMENT));
+        addInstruction(new Instruction(Bytecode.PUSH_LITERAL_ASSIGNMENT));
     }
 
     public void addIntLiteralAndBytecode(int i) {
         int index = addIntLiteral(i);
-        addInstruction(new Instruction(Bytecode.PUSH_LITERAL, LiteralType.INT, index));
+        addInstruction(new Instruction(Bytecode.PUSH_LITERAL_INT, index));
     }
 
     public void addFloatLiteralAndBytecode(float f) {
         int index = addFloatLiteral(f);
-        addInstruction(new Instruction(Bytecode.PUSH_LITERAL, LiteralType.FLOAT, index));
+        addInstruction(new Instruction(Bytecode.PUSH_LITERAL_FLOAT, index));
     }
 
     public void addStringLiteralAndBytecode(String s) {
         int index = addStringLiteral(s);
-        addInstruction(new Instruction(Bytecode.PUSH_LITERAL, LiteralType.STR, index));
+        addInstruction(new Instruction(Bytecode.PUSH_LITERAL_STRING, index));
     }
 
     public void addObjectLiteralAndBytecode(ObjectRepr o) {
         int index = addObjectLiteral(o);
-        addInstruction(new Instruction(Bytecode.PUSH_LITERAL, LiteralType.OBJ, index));
+        addInstruction(new Instruction(Bytecode.PUSH_LITERAL_OBJ, index));
     }
 
     public void addBlockLiteralAndBytecode(ObjectRepr o) {
         int index = addBlockLiteral(o);
-        addInstruction(new Instruction(Bytecode.PUSH_LITERAL, LiteralType.BLOCK, index));
+        addInstruction(new Instruction(Bytecode.PUSH_LITERAL_BLOCK, index));
     }
 
     // Other bytecodes /////////////////////////////////////////////////////////////////////////////////////////////////
@@ -197,22 +160,22 @@ public class CodeContext {
             }
         }
 
-        addInstruction(new Instruction(Bytecode.PUSH_PARENT, Bytecode.NOP, index));
+        addInstruction(new Instruction(Bytecode.PUSH_PARENT, index));
     }
 
     public void addUnaryMessageSendBytecode(String message_name) {
         int index = addString(message_name);
-        addInstruction(new Instruction(Bytecode.SEND, SendType.UNARY, index));
+        addInstruction(new Instruction(Bytecode.SEND_UNARY, index));
     }
 
     public void addBinaryMessageSendBytecode(String message_name) {
         int index = addString(message_name);
-        addInstruction(new Instruction(Bytecode.SEND, SendType.BINARY, index, 1));
+        addInstruction(new Instruction(Bytecode.SEND_BINARY, index, 1));
     }
 
     public void addKeywordMessageSendBytecode(String message_name, int number_of_arguments) {
         int index = addString(message_name);
-        addInstruction(new Instruction(Bytecode.SEND, SendType.KEYWORD, index, number_of_arguments));
+        addInstruction(new Instruction(Bytecode.SEND_KEYWORD, index, number_of_arguments));
     }
 
     public void addReturnTopBytecode() {
@@ -225,11 +188,11 @@ public class CodeContext {
 
     public void addSlotBytecode(String slot_name) {
         int index = addString(slot_name);
-        addInstruction(new Instruction(Bytecode.ADD_SLOT, SlotType.SLOT, index));
+        addInstruction(new Instruction(Bytecode.ADD_SLOT, index));
     }
 
     public void addParentBytecode(String parent_name) {
         int index = addString(parent_name);
-        addInstruction(new Instruction(Bytecode.ADD_SLOT, SlotType.PARENT, index));
+        addInstruction(new Instruction(Bytecode.ADD_PARENT, index));
     }
 }
