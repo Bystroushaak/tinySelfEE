@@ -4,8 +4,11 @@ import eu.rfox.tinySelfEE.vm.object_layout.ObjectRepr;
 
 
 public class Stack {
-    int stack_pointer = 0;
+    public Stack prev_stack;
+    public ObjectRepr self;
+
     int size = 20;
+    int stack_pointer = 0;
 
     ObjectRepr[] stack_array;
 
