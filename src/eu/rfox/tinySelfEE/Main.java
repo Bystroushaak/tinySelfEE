@@ -5,7 +5,10 @@ import eu.rfox.tinySelfEE.parser.ParserException;
 import eu.rfox.tinySelfEE.parser.ast.ASTItem;
 import eu.rfox.tinySelfEE.parser.ast.ASTPrinter;
 import eu.rfox.tinySelfEE.parser.ast.Root;
+import eu.rfox.tinySelfEE.vm.Code;
 import eu.rfox.tinySelfEE.vm.CodeContext;
+import eu.rfox.tinySelfEE.vm.Interpreter;
+import eu.rfox.tinySelfEE.vm.Process;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -55,6 +58,11 @@ public class Main {
 
         CodeContext root_context = new CodeContext();
         ast_root.compile(root_context);
+
+        Code root_code = root_context.compile();
+
+        Interpreter vm = new Interpreter(new Process(root_code));
+        vm.run();
     }
 
     private static void printRawAst(Root ast_root) {

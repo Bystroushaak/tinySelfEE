@@ -4,9 +4,11 @@ import eu.rfox.tinySelfEE.vm.object_layout.ObjectRepr;
 
 public class Interpreter {
     ObjectRepr global_namespace;
+    Process process;
 
-    Interpreter() {
+    public Interpreter(Process p) {
         global_namespace = initGlobalNamespace();
+        process = p;
     }
 
     ObjectRepr initGlobalNamespace() {
@@ -15,11 +17,11 @@ public class Interpreter {
         return gns;
     }
 
-    public void addProcess() {
+    public void run() {
 
     }
 
-    public void run() {
-
+    public void addProcess(Process p) {
+        process = p;
     }
 }

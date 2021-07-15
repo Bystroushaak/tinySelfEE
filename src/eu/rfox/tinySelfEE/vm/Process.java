@@ -5,8 +5,11 @@ import eu.rfox.tinySelfEE.vm.object_layout.ObjectRepr;
 public class Process {
     Stack callstack;
 
-    public Process() {
+    Code code;
+
+    public Process(Code code) {
         callstack = new Stack();
+        this.code = code;
     }
 
     public void push(ObjectRepr o) {
