@@ -42,4 +42,8 @@ public class Process {
     public ObjectRepr getSelf() {
         return callstack.self;
     }
+
+    public void pushSelf() {
+        push(callstack.self);
+    }
 }
