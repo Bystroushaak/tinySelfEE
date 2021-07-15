@@ -13,4 +13,10 @@ public class Code {
     public BlockRepr[] literals_block;
 
     public int[] instructions;
+
+    public String disassemble() {
+        String output = "(\n";
+
+        return output + ")\n";
+    }
 }
