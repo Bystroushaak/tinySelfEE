@@ -1,6 +1,7 @@
 package eu.rfox.tinySelfEE.vm;
 
 import eu.rfox.tinySelfEE.vm.bytecodes.Bytecode;
+import eu.rfox.tinySelfEE.vm.object_layout.BlockRepr;
 import eu.rfox.tinySelfEE.vm.object_layout.ObjectRepr;
 
 import java.util.ArrayList;
@@ -24,12 +25,26 @@ class Instruction {
         this.index = index;
         this.number_of_arguments = number_of_arguments;
     }
+
+    public int size() {
+        return 3;
+    }
+
+    public int saveCode(int[] code_array, int instruction_pointer) {
+        code_array[instruction_pointer++] = bytecode;
+        code_array[instruction_pointer++] = index;
+        code_array[instruction_pointer++] = number_of_arguments;
+
+        return instruction_pointer;
+    }
 }
 
 public class CodeContext {
     /*
     TODO: rework so that primitive objects are directly created - it will save time later and
           they can be cloned efficiently
+
+    TODO: is will_have_slots really used? if not, remove it
     */
     public boolean will_have_slots = false;
 
@@ -39,7 +54,7 @@ public class CodeContext {
     private ArrayList<Float> literals_float;
     private ArrayList<String> literals_str;
     private ArrayList<ObjectRepr> literals_obj;
-    private ArrayList<ObjectRepr> literals_block;
+    private ArrayList<BlockRepr> literals_block;
 
     private ArrayList<Instruction> instructions;
 
@@ -103,7 +118,7 @@ public class CodeContext {
         return literals_obj.size() - 1;
     }
 
-    int addBlockLiteral(ObjectRepr i) {
+    int addBlockLiteral(BlockRepr i) {
         if (literals_block == null) {
             literals_block = new ArrayList<>();
         }
@@ -142,7 +157,7 @@ public class CodeContext {
         addInstruction(new Instruction(Bytecode.PUSH_LITERAL_OBJ, index));
     }
 
-    public void addBlockLiteralAndBytecode(ObjectRepr o) {
+    public void addBlockLiteralAndBytecode(BlockRepr o) {
         int index = addBlockLiteral(o);
         addInstruction(new Instruction(Bytecode.PUSH_LITERAL_BLOCK, index));
     }
@@ -200,5 +215,51 @@ public class CodeContext {
     public void addParentBytecode(String parent_name) {
         int index = addString(parent_name);
         addInstruction(new Instruction(Bytecode.ADD_PARENT, index));
+    }
+
+    /**
+     * Compile the relatively inefficient code to more compact data structures.
+     */
+    public Code compile() {
+        Code code = new Code();
+
+        code.strings = new String[strings.size()];
+        this.strings.toArray(code.strings);
+
+        code.literals_int = new Integer[literals_int.size()];
+        this.literals_int.toArray(code.literals_int);
+
+        code.literals_float = new Float[literals_float.size()];
+        this.literals_float.toArray(code.literals_float);
+
+        code.literals_str = new String[literals_str.size()];
+        this.literals_str.toArray(code.literals_str);
+
+        code.literals_obj = new ObjectRepr[literals_obj.size()];
+        this.literals_obj.toArray(code.literals_obj);
+
+        code.literals_block = new BlockRepr[literals_block.size()];
+        this.literals_block.toArray(code.literals_block);
+
+        int size = 0;
+        for (Instruction instruction : instructions) {
+            size += instruction.size();
+        }
+        code.instructions = new int[size];
+        int instructions_pointer = 0;
+        for (Instruction instruction : instructions) {
+            instructions_pointer = instruction.saveCode(code.instructions, instructions_pointer);
+        }
+
+        for (ObjectRepr obj : literals_obj) {
+            obj.code = obj.code_context.compile();
+            obj.code_context = null;
+        }
+        for (BlockRepr block : literals_block) {
+            block.code = block.code_context.compile();
+            block.code_context = null;
+        }
+
+        return code;
     }
 }

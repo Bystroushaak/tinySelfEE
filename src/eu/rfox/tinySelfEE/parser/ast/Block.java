@@ -44,6 +44,6 @@ public class Block extends Obj {
 
     @Override
     void addLiteral(CodeContext context, ObjectRepr obj) {
-        context.addBlockLiteralAndBytecode(obj);
+        context.addBlockLiteralAndBytecode((BlockRepr) obj);
     }
 }

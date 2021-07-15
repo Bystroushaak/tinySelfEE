@@ -189,7 +189,7 @@ public class Obj implements ASTItem {
 
         if (code != null) {
             CodeContext new_context = new CodeContext();
-            obj.code = new_context;
+            obj.code_context = new_context;
             new_context.will_have_slots = will_have_slots;
 
             for (ASTItem item : code) {

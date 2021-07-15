@@ -1,5 +1,6 @@
 package eu.rfox.tinySelfEE.vm.object_layout.obj_bare;
 
+import eu.rfox.tinySelfEE.vm.Code;
 import eu.rfox.tinySelfEE.vm.CodeContext;
 import eu.rfox.tinySelfEE.vm.object_layout.ObjectInterface;
 import eu.rfox.tinySelfEE.vm.object_layout.SlotNotFoundException;
@@ -11,9 +12,10 @@ import java.util.LinkedHashMap;
 
 
 /**
- * Implementation of the most simple object, without any caching, or any other implementation.
+ * Implementation of the most simple object, without any caching, or any other
+ * optimizations.
  *
- * This will be slow, but good for debugging.
+ * This is slow, but good for debugging.
  */
 public class BareObject implements ObjectInterface {
     static long id_counter = 0;
@@ -23,7 +25,8 @@ public class BareObject implements ObjectInterface {
 
     boolean visited = false;
 
-    public CodeContext code = null;
+    public CodeContext code_context = null;
+    public Code code = null;
     String[] arguments = null;
 
     ObjectInterface scope_parent = null;
