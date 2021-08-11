@@ -44,13 +44,13 @@ package eu.rfox.tinySelfEE.vm.bytecodes;
         Resolve string at <str index> from CodeContext.
         Add `parent` object to Self at slot name suggested by the string.
     RETURN_TOP, NOP, NOP
-        Take object from the top of the stack.
+        Take <object> from the top of the stack.
         Pop stack linked lists in frame.
-        Push object on top of the stack.
+        Push <object> on top of the stack.
     RETURN_BLOCK, NOP, NOP
-        Take object for the top of the stack.
+        Take <object> for the top of the stack.
         Pop stack linked lists in frame, until you get to block's surrounding object.
-        Push object on top of the stack.
+        Push <object> on top of the stack.
  */
 public enum Bytecode {
     NOP(0),
