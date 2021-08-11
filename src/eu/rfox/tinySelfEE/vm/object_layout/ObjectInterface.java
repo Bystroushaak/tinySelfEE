@@ -19,6 +19,7 @@ public interface ObjectInterface {
     ObjectInterface getScopeParent();
 
     boolean hasParents();
+    ObjectInterface getParentByName(String parent_name);
     boolean hasCode();
     boolean hasPrimitiveCode();
 

@@ -65,6 +65,14 @@ public class BareObject implements ObjectInterface {
         return this.parent_slots != null;
     }
 
+    @Override
+    public ObjectInterface getParentByName(String parent_name) {
+        if (parent_slots == null) {
+            return null;
+        }
+        return parent_slots.get(parent_name);
+    }
+
     public HashMap<String, ObjectInterface> getParentSlots() {
         return parent_slots;
     }
