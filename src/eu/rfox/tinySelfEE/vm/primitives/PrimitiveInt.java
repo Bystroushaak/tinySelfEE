@@ -5,6 +5,11 @@ import eu.rfox.tinySelfEE.vm.object_layout.ObjectRepr;
 public class PrimitiveInt extends ObjectRepr {
     int value;
 
+    public PrimitiveInt(int i) {
+        super();
+        this.value = i;
+    }
+
     public int getValue() {
         return value;
     }
