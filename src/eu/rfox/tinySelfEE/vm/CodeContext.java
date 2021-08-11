@@ -4,6 +4,10 @@ import eu.rfox.tinySelfEE.vm.bytecodes.Bytecode;
 import eu.rfox.tinySelfEE.vm.object_layout.BlockRepr;
 import eu.rfox.tinySelfEE.vm.object_layout.ObjectRepr;
 
+import eu.rfox.tinySelfEE.vm.primitives.PrimitiveInt;
+import eu.rfox.tinySelfEE.vm.primitives.PrimitiveFloat;
+import eu.rfox.tinySelfEE.vm.primitives.PrimitiveStr;
+
 import java.util.ArrayList;
 
 class Instruction {
@@ -50,9 +54,9 @@ public class CodeContext {
 
     private ArrayList<String> strings;
 
-    private ArrayList<Integer> literals_int;
-    private ArrayList<Float> literals_float;
-    private ArrayList<String> literals_str;
+    private ArrayList<PrimitiveInt> literals_int;
+    private ArrayList<PrimitiveFloat> literals_float;
+    private ArrayList<PrimitiveStr> literals_str;
     private ArrayList<ObjectRepr> literals_obj;
     private ArrayList<BlockRepr> literals_block;
 
@@ -83,17 +87,17 @@ public class CodeContext {
             literals_int = new ArrayList<>();
         }
 
-        literals_int.add(i);
+        literals_int.add(new PrimitiveInt(i));
 
         return (literals_int.size() - 1);
     }
 
     int addFloatLiteral(float f) {
         if (literals_float == null) {
-            literals_float = new ArrayList<>();
+            literals_float = new ArrayList<PrimitiveFloat>();
         }
 
-        literals_float.add(f);
+        literals_float.add(new PrimitiveFloat(f));
 
         return literals_float.size() - 1;
     }
@@ -103,27 +107,27 @@ public class CodeContext {
             literals_str = new ArrayList<>();
         }
 
-        literals_str.add(s);
+        literals_str.add(new PrimitiveStr(s));
 
         return literals_str.size() - 1;
     }
 
-    int addObjectLiteral(ObjectRepr i) {
+    int addObjectLiteral(ObjectRepr o) {
         if (literals_obj == null) {
             literals_obj = new ArrayList<>();
         }
 
-        literals_obj.add(i);
+        literals_obj.add(o);
 
         return literals_obj.size() - 1;
     }
 
-    int addBlockLiteral(BlockRepr i) {
+    int addBlockLiteral(BlockRepr b) {
         if (literals_block == null) {
             literals_block = new ArrayList<>();
         }
 
-        literals_block.add(i);
+        literals_block.add(b);
 
         return literals_block.size() - 1;
     }
@@ -169,10 +173,10 @@ public class CodeContext {
 
     public void addPushParentBytecode(String parent_name) {
         int index;
-        if (literals_str == null) {
+        if (strings == null) {
             index = addString(parent_name);
         } else {
-            int item_index = literals_str.indexOf(parent_name);
+            int item_index = strings.indexOf(parent_name);
 
             if (item_index == -1) {
                 index = addString(parent_name);
@@ -223,23 +227,35 @@ public class CodeContext {
     public Code compile() {
         Code code = new Code();
 
-        code.strings = new String[strings.size()];
-        this.strings.toArray(code.strings);
+        if (strings != null) {
+            code.strings = new String[strings.size()];
+            this.strings.toArray(code.strings);
+        }
 
-        code.literals_int = new Integer[literals_int.size()];
-        this.literals_int.toArray(code.literals_int);
+        if (literals_int != null) {
+            code.literals_int = new PrimitiveInt[literals_int.size()];
+            this.literals_int.toArray(code.literals_int);
+        }
 
-        code.literals_float = new Float[literals_float.size()];
-        this.literals_float.toArray(code.literals_float);
+        if (literals_float != null) {
+            code.literals_float = new PrimitiveFloat[literals_float.size()];
+            this.literals_float.toArray(code.literals_float);
+        }
 
-        code.literals_str = new String[literals_str.size()];
-        this.literals_str.toArray(code.literals_str);
+        if (literals_str != null) {
+            code.literals_str = new PrimitiveStr[literals_str.size()];
+            this.literals_str.toArray(code.literals_str);
+        }
 
-        code.literals_obj = new ObjectRepr[literals_obj.size()];
-        this.literals_obj.toArray(code.literals_obj);
+        if (literals_obj != null) {
+            code.literals_obj = new ObjectRepr[literals_obj.size()];
+            this.literals_obj.toArray(code.literals_obj);
+        }
 
-        code.literals_block = new BlockRepr[literals_block.size()];
-        this.literals_block.toArray(code.literals_block);
+        if (literals_block != null) {
+            code.literals_block = new BlockRepr[literals_block.size()];
+            this.literals_block.toArray(code.literals_block);
+        }
 
         int size = 0;
         for (Instruction instruction : instructions) {
@@ -251,13 +267,20 @@ public class CodeContext {
             instructions_pointer = instruction.saveCode(code.instructions, instructions_pointer);
         }
 
-        for (ObjectRepr obj : literals_obj) {
-            obj.code = obj.code_context.compile();
-            obj.code_context = null;
+        if (literals_obj != null) {
+            for (ObjectRepr obj : literals_obj) {
+                if (obj.code != null) {
+                    obj.code = obj.code_context.compile();
+                    obj.code_context = null;
+                }
+            }
         }
-        for (BlockRepr block : literals_block) {
-            block.code = block.code_context.compile();
-            block.code_context = null;
+
+        if (literals_block != null) {
+            for (BlockRepr block : literals_block) {
+                block.code = block.code_context.compile();
+                block.code_context = null;
+            }
         }
 
         return code;
