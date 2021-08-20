@@ -3,6 +3,7 @@ package eu.rfox.tinySelfEE.vm.object_layout.obj_bare;
 import eu.rfox.tinySelfEE.vm.Code;
 import eu.rfox.tinySelfEE.vm.CodeContext;
 import eu.rfox.tinySelfEE.vm.object_layout.ObjectInterface;
+import eu.rfox.tinySelfEE.vm.object_layout.ObjectRepr;
 import eu.rfox.tinySelfEE.vm.object_layout.SlotNotFoundException;
 
 import java.util.ArrayList;
@@ -93,7 +94,7 @@ public class BareObject implements ObjectInterface {
         return false;
     }
 
-    public ObjectInterface clone(BareObject o) {
+    public ObjectRepr clone(ObjectRepr o) {
         o.code = this.code;
 
         if (this.arguments != null) {
@@ -112,8 +113,8 @@ public class BareObject implements ObjectInterface {
         return o;
     }
 
-    public ObjectInterface clone() {
-        BareObject o = new BareObject();
+    public ObjectRepr clone() {
+        ObjectRepr o = new ObjectRepr();
         return this.clone(o);
     }
 

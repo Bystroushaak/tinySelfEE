@@ -7,7 +7,7 @@ public class BlockRepr extends ObjectRepr {
         super();
     }
 
-    public ObjectInterface clone() {
+    public BlockRepr clone() {
         BlockRepr b = new BlockRepr();
         super.clone(b);
 

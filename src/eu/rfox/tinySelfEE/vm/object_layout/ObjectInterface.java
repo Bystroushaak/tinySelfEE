@@ -2,7 +2,6 @@ package eu.rfox.tinySelfEE.vm.object_layout;
 
 import eu.rfox.tinySelfEE.vm.CodeContext;
 
-import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
 
