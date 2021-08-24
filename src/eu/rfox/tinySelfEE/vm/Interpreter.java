@@ -141,11 +141,11 @@ public class Interpreter {
     }
 
     void doPushLiteralInt(int index, int number_of_arguments, Code code) {
-        process.push(code.literals_str[index]);  // TODO: solve for mutable state by cloning
+        process.push(code.literals_int[index]);  // TODO: solve for mutable state by cloning
     }
 
     void doPushLiteralFloat(int index, int number_of_arguments, Code code) {
-        process.push(code.literals_str[index]);  // TODO: solve for mutable state by cloning
+        process.push(code.literals_float[index]);  // TODO: solve for mutable state by cloning
     }
 
     void doPushLiteralString(int index, int number_of_arguments, Code code) {
