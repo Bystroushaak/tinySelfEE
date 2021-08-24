@@ -155,6 +155,8 @@ public class Obj implements ASTItem {
     public CodeContext compile(CodeContext context) {
         ObjectRepr obj = getOjbForCompilation();
 
+        obj.ast = toString();
+
         if (arguments != null) {
             String[] arguments_array = new String[arguments.size()];
             arguments.toArray(arguments_array);

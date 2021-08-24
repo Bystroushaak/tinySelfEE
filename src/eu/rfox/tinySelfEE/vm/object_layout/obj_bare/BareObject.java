@@ -30,6 +30,8 @@ public class BareObject implements ObjectInterface {
     public Code code = null;
     String[] arguments = null;
 
+    public String ast = "";
+
     ObjectInterface scope_parent = null;
     HashMap<String, ObjectInterface> slots = null;
     HashMap<String, ObjectInterface> parent_slots = null;
