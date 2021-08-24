@@ -6,6 +6,7 @@ import eu.rfox.tinySelfEE.vm.object_layout.ObjectRepr;
 public class Stack {
     public Stack prev_stack;
     public ObjectRepr self;
+    public int ip = 0;
 
     int size = 20;
     int stack_pointer = 0;

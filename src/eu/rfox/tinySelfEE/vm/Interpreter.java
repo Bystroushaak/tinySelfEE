@@ -42,7 +42,6 @@ public class Interpreter {
         Code code = process.code;
         int[] instructions = code.instructions;
         int code_length = instructions.length;
-        int ip = 0;
 
         int bytecode;
         int index;
@@ -52,10 +51,10 @@ public class Interpreter {
             process.setSelf(global_namespace);
         }
 
-        while (ip < code_length && ! this.has_error) {
-            bytecode = instructions[ip++];
-            index = instructions[ip++];
-            number_of_arguments = instructions[ip++];
+        while (process.callstack.ip < code_length && ! this.has_error) {
+            bytecode = instructions[process.callstack.ip++];
+            index = instructions[process.callstack.ip++];
+            number_of_arguments = instructions[process.callstack.ip++];
 
             // TODO: remove unused parameters from method that don't need them
             if (bytecode == Bytecode.NOP.value) {
