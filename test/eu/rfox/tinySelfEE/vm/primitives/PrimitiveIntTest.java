@@ -64,7 +64,7 @@ public class PrimitiveIntTest {
         }
 
         Process p = new Process(new Code());
-        PrimitiveInt result = (PrimitiveInt) plus.evaluate(p, first, second);
+        PrimitiveInt result = (PrimitiveInt) plus.evaluate(p, first, new PrimitiveInt[]{second});
         assertEquals(result.getValue(), 5);
     }
 

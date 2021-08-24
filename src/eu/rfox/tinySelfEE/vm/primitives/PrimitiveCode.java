@@ -8,6 +8,6 @@ public abstract class PrimitiveCode extends ObjectRepr {
         return true;
     }
 
-    abstract ObjectRepr evaluate(Process process, ObjectRepr self, ObjectRepr other)
+    abstract public ObjectRepr evaluate(Process process, ObjectRepr self, ObjectRepr[] others)
             throws InvalidParametersException;
 }

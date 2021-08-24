@@ -2,3 +2,5 @@
 /lib/
 /out/
 /.gradle/
+/docs/analysis/.idea/
+/.idea/

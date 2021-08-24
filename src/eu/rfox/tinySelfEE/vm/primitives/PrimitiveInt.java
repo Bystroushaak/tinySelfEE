@@ -10,19 +10,38 @@ class PrimitiveIntAdd extends PrimitiveCode {
         this.setArguments(new String[]{"b"});
     }
 
-    public ObjectRepr evaluate(Process process, PrimitiveInt self, PrimitiveInt other) {
+    public ObjectRepr evaluate(Process process, PrimitiveInt self, PrimitiveInt[] others) {
+        PrimitiveInt other = others[0];
         PrimitiveInt new_val = new PrimitiveInt(self.getValue() + other.getValue());
         return new_val;
     }
 
-    public ObjectRepr evaluate(Process process, PrimitiveInt self, PrimitiveFloat other) {
+    public ObjectRepr evaluate(Process process, PrimitiveInt self, PrimitiveFloat[] others) {
+        PrimitiveFloat other = others[0];
         PrimitiveFloat new_val = new PrimitiveFloat(self.getValue() + other.getValue());
         return new_val;
     }
 
-    public ObjectRepr evaluate(Process process, ObjectRepr self, ObjectRepr other)
+    public ObjectRepr evaluate(Process process, ObjectRepr self, ObjectRepr[] others)
             throws InvalidParametersException {
         throw new InvalidParametersException("PrimitiveInt's + can only evaluate other ints and floats.");
+    }
+}
+
+
+class PrimitiveIntPrint extends PrimitiveCode {
+    public PrimitiveIntPrint() {
+        super();
+    }
+
+    public ObjectRepr evaluate(Process process, PrimitiveInt self, ObjectRepr[] others) {
+        System.out.print(self.getValue());
+        return PrimitiveNil.getInstance();
+    }
+
+    @Override
+    public ObjectRepr evaluate(Process process, ObjectRepr self, ObjectRepr[] others) throws InvalidParametersException {
+        return this.evaluate(process, (PrimitiveInt) self, others);
     }
 }
 
@@ -34,6 +53,7 @@ class PrimitiveIntTrait extends ObjectRepr {
         super();
 
         this.setSlot("+", new PrimitiveIntAdd());
+        this.setSlot("print", new PrimitiveIntPrint());
     }
 
     public static PrimitiveIntTrait getInstance() {
