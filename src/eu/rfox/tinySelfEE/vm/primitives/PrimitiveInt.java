@@ -3,7 +3,8 @@ package eu.rfox.tinySelfEE.vm.primitives;
 import eu.rfox.tinySelfEE.vm.Process;
 import eu.rfox.tinySelfEE.vm.object_layout.ObjectRepr;
 
-class PrimitiveIntAdd extends ObjectRepr implements PrimitiveEval {
+
+class PrimitiveIntAdd extends PrimitiveCode {
     public PrimitiveIntAdd() {
         super();
         this.setArguments(new String[]{"b"});

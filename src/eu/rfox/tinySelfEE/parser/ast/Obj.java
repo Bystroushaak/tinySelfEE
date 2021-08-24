@@ -170,6 +170,8 @@ public class Obj implements ASTItem {
                 String slot_name = entry.getKey();
                 ASTItem slot_item = entry.getValue();
 
+                // TODO: this is completely wrong, I need to push slot object to the
+                //       stack first
                 slot_item.compile(context);
                 context.addSlotBytecode(slot_name);
 

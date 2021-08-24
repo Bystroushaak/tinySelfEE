@@ -47,6 +47,7 @@ public class PrimitiveIntTest {
             return;
         }
 
+        assertTrue(plus.hasPrimitiveCode());
     }
 
     @Test
