@@ -61,8 +61,12 @@ public class Main {
 
         Code root_code = root_context.compile();
 
+        System.out.println(root_code.disassemble());
+
         Interpreter vm = new Interpreter(new Process(root_code));
         vm.run();
+
+        System.out.println("Done.");
     }
 
     private static void printRawAst(Root ast_root) {
